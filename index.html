@@ -130,7 +130,7 @@
   <div class="wrap">
     <div class="header">
       <div class="pill">● PETCHEM WAR ROOM · EMERGENCY BOARD</div>
-      <h1>13주 석유화학 워룸 대시보드</h1>
+      <h1>[WarRoom] 이란리스크 시나리오별 사전원가 overview (3/6일자 기준)</h1>
       <div class="sub">
         미-이스라엘-이란 전쟁 시나리오 기반 상황판입니다. 시나리오, 주차, 품목, 그래프 유형을 직접 조작하며
         WTI와 주요 원료·유도품의 13주 평균 경로를 비교할 수 있습니다.
@@ -475,7 +475,7 @@ function activateChips(selector, value, attr, setter){
 }
 
 function updateHeaderAndScenario(){
-  document.getElementById("kpiScenario").textContent = state.selectedScenario;
+  document.getElementById("kpiScenario").textContent = scenarios[state.selectedScenario].label;
   document.getElementById("kpiScenarioLabel").textContent = scenarios[state.selectedScenario].label.replace(/^S\d\s/, "");
   document.getElementById("scenarioDescTitle").textContent = `${scenarios[state.selectedScenario].label} · 확률 ${scenarios[state.selectedScenario].probability}`;
   document.getElementById("scenarioSummary").textContent = scenarios[state.selectedScenario].summary;
