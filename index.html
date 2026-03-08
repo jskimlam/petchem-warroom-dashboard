@@ -239,6 +239,27 @@
         </div>
         <div class="summary-box" id="insightText" style="margin-top:12px"></div>
         <div class="summary-box" id="insightRange" style="margin-top:10px"></div>
+        <div class="summary-box" id="absReasonBox" style="margin-top:10px; display:none;">
+          <div style="font-weight:800; margin-bottom:10px;">왜 ABS 가격은 원료만큼 오르지 않는가</div>
+          <div style="display:grid; gap:10px;">
+            <div style="padding:10px 12px; border:1px solid #304767; border-radius:12px; background:#14243a;">
+              <div style="font-weight:700; margin-bottom:4px;">원가 전가 지연</div>
+              <div style="font-size:13px; color:#dbe7fa;">ABS는 SM·BD·AN 복합 원가 구조이나, 월·분기 단위 계약 관행으로 판가 반영에 3~4주 래그가 발생합니다.</div>
+            </div>
+            <div style="padding:10px 12px; border:1px solid #304767; border-radius:12px; background:#14243a;">
+              <div style="font-weight:700; margin-bottom:4px;">수요 파괴 압력</div>
+              <div style="font-size:13px; color:#dbe7fa;">ABS가 고가 구간에 진입하면 자동차·가전·IT 바이어의 구매 저항이 커지고, 일부는 PP·HIPS 등 대체재 검토로 이동합니다.</div>
+            </div>
+            <div style="padding:10px 12px; border:1px solid #304767; border-radius:12px; background:#14243a;">
+              <div style="font-weight:700; margin-bottom:4px;">중국 공급 과잉 구조</div>
+              <div style="font-size:13px; color:#dbe7fa;">중국 내 유휴 설비와 수출 압력이 버퍼로 작동해, 원료 급등이 발생해도 ABS 가격 상단은 상대적으로 제한됩니다.</div>
+            </div>
+            <div style="padding:10px 12px; border:1px solid #455d82; border-radius:12px; background:rgba(96,165,250,.08);">
+              <div style="font-weight:800; margin-bottom:4px;">결론</div>
+              <div style="font-size:13px; color:#eef4ff;">ABS는 원료 충격이 가격에 즉시 100% 반영되기보다 지연·희석되며, 결과적으로 가격보다 마진이 먼저 압축되는 구조입니다.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -302,19 +323,19 @@ const monthMap = {
 };
 const scenarios = {
   S1: {
-    label: "조기종전", probability: "20%",
+    label: "조기종전", probability: "20%", duration: "약 3~4주",
     summary: "3~4주 내 호르무즈 통행 일부 재개, 6~8주 내 실질 완화. W4 이후 공급 회복 신호가 가격 안정화로 이어지는 시나리오.",
     assumption: ["재보험 지원으로 해운사 3~4주 내 부분 복귀","이란 신정부 협상 수용 가능성 확대","IEA 비축유 방출 + OPEC+ 증산 효과 동시 반영","W6~W7부터 올레핀 가격 하락 전환"],
     triggers: ["미 해군 호르무즈 일부 호위 재개","이란 신정부 협상 수용 신호","보험 인수 재개 및 탱커 복귀"]
   },
   S2: {
-    label: "교착유지", probability: "55%",
+    label: "교착유지", probability: "55%", duration: "약 6~10주",
     summary: "봉쇄 6~10주 지속, 13주 내 뚜렷한 해소 없음. 대체 물량은 늦게 도착하고 하류는 원가 전가에 실패하며 마진이 최악으로 악화되는 기준 시나리오.",
     assumption: ["IRGC 잔존 세력의 해협 위협 지속","보험 재개 불발, 해운 중단 장기화","대체 물량 도착은 W6~W8 이후","W3~W4 아시아 크래커 2차 감산 발생"],
     triggers: ["한국 크래커 2차 셧다운 확대","IEA 비축유 방출에도 실물 완화 제한","대체 나프타 도착 지연 또는 규모 부족"]
   },
   S3: {
-    label: "확전·장기화", probability: "25%",
+    label: "확전·장기화", probability: "25%", duration: "13주 이상",
     summary: "사우디·UAE 인프라 추가 피격, 기뢰 부설 등으로 공급 위기가 13주 내내 심화되는 시나리오. 유가와 원료 가격이 역사적 고점권으로 진입.",
     assumption: ["사우디/아람코·UAE 인프라 2차 타격","호르무즈 기뢰 부설로 물리적 통항 불가 전환","러시아산 대체 나프타 차단 가능성","ABS·MMA 등 하류 생산 채산성 붕괴"],
     triggers: ["사우디 아람코 추가 피격","기뢰 부설 확인 보도","러·중의 간접 개입 및 제재 확대"]
@@ -493,7 +514,8 @@ function wireMultiOffButton(){
 
 function updateHeaderAndScenario(){
   document.getElementById("kpiScenario").textContent = scenarios[state.selectedScenario].label;
-  document.getElementById("kpiScenarioLabel").textContent = scenarios[state.selectedScenario].label.replace(/^S\d\s/, "");
+  document.getElementById("kpiScenarioLabel").textContent = scenarios[state.selectedScenario].label;
+  document.getElementById("kpiScenarioDuration").textContent = `예상 지속기간 · ${scenarios[state.selectedScenario].duration}`;
   document.getElementById("scenarioDescTitle").textContent = `${scenarios[state.selectedScenario].label} · 확률 ${scenarios[state.selectedScenario].probability}`;
   document.getElementById("scenarioSummary").textContent = scenarios[state.selectedScenario].summary;
 
@@ -592,6 +614,10 @@ function updateProductInsight(){
   document.getElementById("insightPeakSub").textContent = peakWeek;
   document.getElementById("insightText").textContent = p.insight;
   document.getElementById("insightRange").innerHTML = `선택 시나리오 범위 · 최저 <b>${fmt(trough)}</b> / 최고 <b>${fmt(peak)}</b>`;
+  const absReasonBox = document.getElementById("absReasonBox");
+  if (absReasonBox) {
+    absReasonBox.style.display = state.selectedProduct === "abs" ? "block" : "none";
+  }
   const weeklyDesc = document.getElementById("weeklyTableDesc");
   if(weeklyDesc) weeklyDesc.textContent = `${p.label}의 W1~W13 시나리오별 가격 및 평균값`;
 
