@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Petchem War Room Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#07111f;
+      --panel:#0d1829;
+      --panel2:#111f33;
+      --line:#22314b;
+      --text:#eef4ff;
+      --muted:#9db0cf;
+      --green:#22c55e;
+      --amber:#f59e0b;
+      --red:#ef4444;
+      --blue:#60a5fa;
+      --cyan:#22d3ee;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:radial-gradient(circle at top, #10203a 0%, #07111f 35%, #050c16 100%);
+      color:var(--text);
+      font-family:Arial, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    }
+    .wrap{max-width:1440px; margin:0 auto; padding:20px;}
+    .header{
+      background:linear-gradient(135deg, rgba(239,68,68,.14), rgba(96,165,250,.08));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:24px;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      background:rgba(239,68,68,.12); color:#ffb4b4; font-size:12px; font-weight:700;
+      border:1px solid rgba(239,68,68,.22);
+      letter-spacing:.04em;
+    }
+    h1{margin:12px 0 8px; font-size:34px}
+    .sub{color:var(--muted); line-height:1.6}
+    .grid{display:grid; gap:16px}
+    .grid-4{grid-template-columns:repeat(4,1fr)}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .grid-2{grid-template-columns:1.35fr .65fr}
+    .grid-main{grid-template-columns:1.1fr .9fr}
+    .card{
+      background:linear-gradient(180deg, rgba(17,31,51,.95), rgba(9,18,31,.95));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 18px 48px rgba(0,0,0,.22);
+    }
+    .kpi{padding:16px 18px}
+    .kpi .label{font-size:12px;color:var(--muted); letter-spacing:.05em}
+    .kpi .value{font-size:32px; font-weight:800; margin-top:8px}
+    .kpi .subv{font-size:12px; color:var(--muted); margin-top:6px}
+    .section-title{font-size:21px; font-weight:800; margin:0 0 6px}
+    .section-desc{color:var(--muted); font-size:13px; margin-bottom:14px}
+    .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+    .btn,.chip,select{
+      border:1px solid #334766; background:#0e1a2d; color:var(--text);
+      border-radius:999px; padding:10px 14px; cursor:pointer; font-size:13px;
+    }
+    select{border-radius:12px; padding:11px 12px}
+    .btn.active,.chip.active{
+      background:linear-gradient(180deg, #183252, #10233b);
+      border-color:#6ea8ff;
+      box-shadow:0 0 0 1px rgba(110,168,255,.25) inset;
+    }
+    .btn:hover,.chip:hover{filter:brightness(1.08)}
+    .weekbar{display:flex; flex-wrap:wrap; gap:8px}
+    .metrics{display:grid; grid-template-columns:repeat(5,1fr); gap:14px}
+    .metric{
+      border-radius:16px; padding:16px;
+      border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.05)
+    }
+    .metric .m1{font-size:12px; color:#c7d7f4}
+    .metric .m2{font-size:31px; font-weight:800; margin-top:8px}
+    .metric .m3{font-size:12px; color:#b1c3e3; margin-top:6px}
+    .scenario-note{background:rgba(255,255,255,.04); border-radius:16px; padding:14px; color:#dbe7fa; line-height:1.65}
+    .taglist{display:flex; flex-wrap:wrap; gap:8px}
+    .tag{
+      padding:7px 10px; font-size:12px; border-radius:999px;
+      background:#14243a; border:1px solid #304767; color:#d8e5fb;
+    }
+    .warn-normal{color:#86efac}.warn-caution{color:#7dd3fc}.warn-warning{color:#fcd34d}.warn-critical{color:#fca5a5}
+    .bg-normal{background:rgba(34,197,94,.10); border-color:rgba(34,197,94,.25)}
+    .bg-caution{background:rgba(34,211,238,.10); border-color:rgba(34,211,238,.25)}
+    .bg-warning{background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.28)}
+    .bg-critical{background:rgba(239,68,68,.10); border-color:rgba(239,68,68,.28)}
+    .summary-box{
+      border-radius:16px; padding:14px; border:1px solid var(--line); background:rgba(255,255,255,.04);
+      color:#dbe7fa; line-height:1.65;
+    }
+    .canvas-box{height:360px}
+    .canvas-box.large{height:420px}
+    .two-col{display:grid; grid-template-columns:1.3fr .7fr; gap:16px}
+    .data-table{width:100%; border-collapse:collapse; font-size:13px}
+    .data-table th,.data-table td{padding:11px 10px; border-bottom:1px solid #22314b; text-align:left}
+    .data-table th{color:var(--muted); font-weight:700}
+    .data-table tr:hover td{background:rgba(255,255,255,.03)}
+    .hl td{background:rgba(96,165,250,.08)}
+    .toggle-wrap{display:flex; flex-wrap:wrap; gap:8px}
+    .footer-note{color:var(--muted); font-size:12px; line-height:1.6}
+    @media (max-width:1200px){
+      .grid-4,.metrics,.grid-2,.grid-main,.two-col{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:900px){
+      .grid-4,.metrics,.grid-2,.grid-main,.two-col{grid-template-columns:1fr}
+      h1{font-size:28px}
+      .metric .m2,.kpi .value{font-size:26px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="pill">● PETCHEM WAR ROOM · EMERGENCY BOARD</div>
+      <h1>13주 석유화학 워룸 대시보드</h1>
+      <div class="sub">
+        미-이스라엘-이란 전쟁 시나리오 기반 상황판입니다. 시나리오, 주차, 품목, 그래프 유형을 직접 조작하며
+        Brent 유가와 주요 원료·유도품의 13주 평균 경로를 비교할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="grid grid-4" style="margin-top:16px">
+      <div class="card kpi"><div class="label">기준 시나리오</div><div class="value" id="kpiScenario">S2</div><div class="subv" id="kpiScenarioLabel">교착 유지</div></div>
+      <div class="card kpi"><div class="label">전망 기간</div><div class="value">13주</div><div class="subv">2026.03.09 ~ 2026.06.05</div></div>
+      <div class="card kpi"><div class="label">기준 Brent</div><div class="value">$90.09</div><div class="subv">기준 시점</div></div>
+      <div class="card kpi"><div class="label">대상 품목</div><div class="value">10개</div><div class="subv">나프타 ~ ABS</div></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="card">
+        <div class="section-title">지휘관 요약</div>
+        <div class="section-desc">현재 선택 시나리오와 주차 기준 즉시 판단 포인트</div>
+        <div class="summary-box" id="commandHeadline"></div>
+        <div class="summary-box" id="commandAction" style="margin-top:10px"></div>
+        <div class="summary-box" id="commandWatch" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">상황실 경보</div>
+        <div class="section-desc">선택 주차와 제품 기준 위험 등급</div>
+        <div class="metrics" style="grid-template-columns:1fr 1fr; gap:12px">
+          <div class="metric" id="riskOilBox">
+            <div class="m1">GLOBAL OIL STATUS</div>
+            <div class="m2" id="riskOilValue"></div>
+            <div class="m3" id="riskOilLabel"></div>
+          </div>
+          <div class="metric" id="riskProductBox">
+            <div class="m1">PRODUCT STATUS</div>
+            <div class="m2" id="riskProductValue"></div>
+            <div class="m3" id="riskProductLabel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">시나리오 선택</div>
+      <div class="section-desc">S1 / S2 / S3 전환과 유가 차트 조작</div>
+      <div class="toolbar" id="scenarioButtons"></div>
+      <div class="toolbar" style="margin-top:10px">
+        <span style="color:var(--muted); font-size:13px">유가 그래프</span>
+        <button class="chip" data-oil-type="curve">곡선</button>
+        <button class="chip" data-oil-type="line">선</button>
+        <button class="chip" data-oil-type="bar">막대</button>
+      </div>
+      <div class="canvas-box" style="margin-top:14px"><canvas id="oilChart"></canvas></div>
+    </div>
+
+    <div class="grid grid-main" style="margin-top:16px">
+      <div class="card">
+        <div class="section-title">시나리오 설명</div>
+        <div class="section-desc" id="scenarioDescTitle"></div>
+        <div class="scenario-note" id="scenarioSummary"></div>
+        <div style="margin-top:14px; font-weight:700">핵심 전제</div>
+        <div class="taglist" id="assumptionTags" style="margin-top:8px"></div>
+        <div style="margin-top:14px; font-weight:700">모니터링 트리거</div>
+        <div id="triggerList" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">상황판 핵심 숫자</div>
+        <div class="section-desc">선택 주차 기준 Brent와 선택 품목의 시나리오별 값 및 평균값</div>
+        <div class="weekbar" id="weekButtons"></div>
+        <div style="margin-top:10px; color:var(--muted); font-size:13px" id="selectedWeekText"></div>
+        <div class="metrics" style="margin-top:14px">
+          <div class="metric"><div class="m1">Brent</div><div class="m2" id="metricOil"></div><div class="m3" id="metricOilSub"></div></div>
+          <div class="metric"><div class="m1">선택 품목 평균값</div><div class="m2" id="metricAvg"></div><div class="m3" id="metricAvgSub"></div></div>
+          <div class="metric"><div class="m1">S1</div><div class="m2" id="metricS1"></div><div class="m3" id="metricS1Sub"></div></div>
+          <div class="metric"><div class="m1">S2</div><div class="m2" id="metricS2"></div><div class="m3" id="metricS2Sub"></div></div>
+          <div class="metric"><div class="m1">S3</div><div class="m2" id="metricS3"></div><div class="m3" id="metricS3Sub"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:16px">
+      <div class="card">
+        <div class="section-title">품목별 13주 추이 비교</div>
+        <div class="section-desc">선택 품목의 S1 / S2 / S3 비교</div>
+        <div class="toolbar">
+          <select id="productSelect"></select>
+          <button class="chip" data-product-type="curve">곡선</button>
+          <button class="chip" data-product-type="line">선</button>
+          <button class="chip" data-product-type="bar">막대</button>
+        </div>
+        <div class="canvas-box large" style="margin-top:14px"><canvas id="productChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">선택 제품 인사이트</div>
+        <div class="section-desc" id="insightTitle"></div>
+        <div class="metrics" style="grid-template-columns:1fr 1fr; gap:12px">
+          <div class="metric"><div class="m1">현재가</div><div class="m2" id="insightCurrent"></div><div class="m3">기준값</div></div>
+          <div class="metric"><div class="m1">W13</div><div class="m2" id="insightW13"></div><div class="m3" id="insightW13Sub"></div></div>
+          <div class="metric"><div class="m1">현재 대비</div><div class="m2" id="insightPct"></div><div class="m3">선택 시나리오</div></div>
+          <div class="metric"><div class="m1">피크</div><div class="m2" id="insightPeak"></div><div class="m3" id="insightPeakSub"></div></div>
+        </div>
+        <div class="summary-box" id="insightText" style="margin-top:12px"></div>
+        <div class="summary-box" id="insightRange" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">멀티 품목 워룸 비교</div>
+      <div class="section-desc">선택 시나리오 기준으로 여러 품목을 ON / OFF 하여 동시에 비교</div>
+      <div class="toggle-wrap" id="multiProductToggles"></div>
+      <div class="canvas-box large" style="margin-top:14px"><canvas id="multiChart"></canvas></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">W13 최종 도달 가격 요약</div>
+      <div class="section-desc">카테고리별 필터링 가능</div>
+      <div class="toolbar" id="categoryButtons"></div>
+      <div style="overflow:auto; margin-top:12px">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>제품</th>
+              <th>현재가</th>
+              <th>S1 W13</th>
+              <th>S2 W13</th>
+              <th>S3 W13</th>
+              <th>S2 현재比</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">주차별 평균값 테이블</div>
+      <div class="section-desc">선택 품목의 주차별 S1 / S2 / S3 및 평균값</div>
+      <div style="overflow:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>주차</th>
+              <th>기간</th>
+              <th>S1</th>
+              <th>S2</th>
+              <th>S3</th>
+              <th>평균값</th>
+            </tr>
+          </thead>
+          <tbody id="weeklyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">사용 메모</div>
+      <div class="footer-note">
+        이 단일 HTML 파일은 별도 빌드 없이 브라우저에서 바로 열 수 있습니다. 다만 차트는 CDN으로 불러오는 Chart.js를 사용하므로 인터넷 연결 환경에서 여는 것을 권장합니다.
+      </div>
+    </div>
+  </div>
+
+<script>
+const weeks = ["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13"];
+const dateLabels = {
+  W1: "3/09~3/14", W2: "3/16~3/21", W3: "3/23~3/28", W4: "3/30~4/04", W5: "4/07~4/11",
+  W6: "4/14~4/18", W7: "4/21~4/25", W8: "4/28~5/02", W9: "5/05~5/09", W10: "5/12~5/16",
+  W11: "5/19~5/23", W12: "5/26~5/30", W13: "6/01~6/05"
+};
+const scenarios = {
+  S1: {
+    label: "S1 조기 종전", probability: "20%",
+    summary: "3~4주 내 호르무즈 통행 일부 재개, 6~8주 내 실질 완화. W4 이후 공급 회복 신호가 가격 안정화로 이어지는 시나리오.",
+    assumption: ["재보험 지원으로 해운사 3~4주 내 부분 복귀","이란 신정부 협상 수용 가능성 확대","IEA 비축유 방출 + OPEC+ 증산 효과 동시 반영","W6~W7부터 올레핀 가격 하락 전환"],
+    triggers: ["미 해군 호르무즈 일부 호위 재개","이란 신정부 협상 수용 신호","보험 인수 재개 및 탱커 복귀"]
+  },
+  S2: {
+    label: "S2 교착 유지", probability: "55%",
+    summary: "봉쇄 6~10주 지속, 13주 내 뚜렷한 해소 없음. 대체 물량은 늦게 도착하고 하류는 원가 전가에 실패하며 마진이 최악으로 악화되는 기준 시나리오.",
+    assumption: ["IRGC 잔존 세력의 해협 위협 지속","보험 재개 불발, 해운 중단 장기화","대체 물량 도착은 W6~W8 이후","W3~W4 아시아 크래커 2차 감산 발생"],
+    triggers: ["한국 크래커 2차 셧다운 확대","IEA 비축유 방출에도 실물 완화 제한","대체 나프타 도착 지연 또는 규모 부족"]
+  },
+  S3: {
+    label: "S3 확전·장기화", probability: "25%",
+    summary: "사우디·UAE 인프라 추가 피격, 기뢰 부설 등으로 공급 위기가 13주 내내 심화되는 시나리오. 유가와 원료 가격이 역사적 고점권으로 진입.",
+    assumption: ["사우디/아람코·UAE 인프라 2차 타격","호르무즈 기뢰 부설로 물리적 통항 불가 전환","러시아산 대체 나프타 차단 가능성","ABS·MMA 등 하류 생산 채산성 붕괴"],
+    triggers: ["사우디 아람코 추가 피격","기뢰 부설 확인 보도","러·중의 간접 개입 및 제재 확대"]
+  }
+};
+
+const products = {
+  brent:{label:"Brent 유가", unit:"$/bbl", category:"oil", current:90.09,
+    S1:[92,94,93,91,88,85,83,81,79,78,77,76,76], S2:[93,98,102,104,105,103,101,99,98,97,96,96,96], S3:[95,108,118,124,128,130,128,126,122,118,116,115,115],
+    insight:"유가는 모든 제품의 선행 지표 역할을 하며, S2에서는 $96 수준 고착, S3에서는 $115 이상 고점권이 유지됩니다."},
+  naphtha:{label:"나프타", unit:"$/mt", category:"feedstock", current:776,
+    S1:[805,815,810,800,788,775,760,748,735,726,718,712,708], S2:[825,870,900,915,920,910,896,882,870,860,852,845,840], S3:[860,935,1000,1065,1095,1105,1095,1085,1055,1029,1012.5,1000,990],
+    insight:"호르무즈 직접 통과 물량 차단 영향이 가장 직접적이며 S2에서 W2~W5 고점 형성, S3에서는 아시아 크래커 손익분기점을 크게 상회합니다."},
+  ethylene:{label:"에틸렌", unit:"$/mt", category:"olefin", current:975,
+    S1:[985,975,955,935,915,890,870,850,833,820,809,799,791], S2:[1010,1045,1070,1080,1087.5,1075,1055,1035,1018,1003,990,980,972], S3:[1050,1145,1220,1270,1310,1330,1320,1300,1270,1240,1220,1205,1192],
+    insight:"나프타 대비 2주가량 지연 반영되며 S2에서는 $930~1,050 고착, S3에서는 2008년 이후 최고가 영역 가능성이 제시됩니다."},
+  propylene:{label:"프로필렌", unit:"$/mt", category:"olefin", current:975,
+    S1:[985,965,940,917,897,876,859,845,832,821,812,804,798], S2:[1012.5,1047.5,1072.5,1082.5,1087,1077.5,1058.5,1040.5,1023.5,1008.5,995.5,985.5,976.5], S3:[1057.5,1152.5,1227.5,1280,1320,1335,1325,1305,1275,1248,1228,1213,1200],
+    insight:"PDH 마진 악화로 하방 지지력이 더 강하고, S-Oil RFCC 재가동 이후에도 구조적 부족이 지속되는 설정입니다."},
+  benzene:{label:"벤젠", unit:"$/mt", category:"aromatics", current:967,
+    S1:[967.5,957.5,945.5,930.5,912.5,894.5,878.5,866.5,855.5,846.5,838.5,832.5,827.5], S2:[980,992.5,1001.5,1003.5,1000,992,980,968,957,946,938,932,926], S3:[1015,1050,1081.5,1104,1120.5,1127.5,1120.5,1107.5,1089.5,1072.5,1060.5,1052.5,1045.5],
+    insight:"중동 직수출 영향은 제한적이지만 원가·심리 급등과 보수 시즌이 겹치며 S2에서도 타이트한 구간이 유지됩니다."},
+  styrene:{label:"스티렌", unit:"$/mt", category:"derivatives", current:1171,
+    S1:[1180,1170,1155,1137,1118,1100,1083,1069,1058,1048,1039,1032,1026], S2:[1195,1220,1247.5,1268,1278,1275,1262,1245,1230,1216,1204,1195,1187], S3:[1225,1290,1360,1420,1462.5,1487.5,1482.5,1462.5,1435.5,1410.5,1390.5,1374.5,1362.5],
+    insight:"에틸렌+벤젠 복합 원가 구조로 2~3주 지연 반영되며 S2는 W3~W6 정점, S3는 $1,500 접근이 가능한 고가 구간입니다."},
+  butadiene:{label:"부타디엔", unit:"$/mt", category:"derivatives", current:1500,
+    S1:[1540,1535,1525,1512,1496,1479,1462,1448,1436,1426,1418,1412,1407], S2:[1580,1660,1725,1765,1785,1775,1755,1733,1713,1696,1682,1671,1662], S3:[1655,1800,1915,1990,2040,2060,2050,2020,1980,1943,1912,1888,1868],
+    insight:"C4 스트림 감산이 직접 반영돼 충격이 가장 큰 제품군이며 S2에서 $1,700, S3에서 $2,000 부근까지 열려 있습니다."},
+  an:{label:"AN", unit:"$/mt", category:"downstream", current:1120,
+    S1:[1135,1125,1110,1092,1075,1059,1046,1035,1026,1019,1013,1008,1004], S2:[1155,1190,1220.5,1239,1247,1241,1227,1211,1197,1185,1175,1167,1160], S3:[1190,1265,1330,1382.5,1420,1435,1428,1410,1385,1362,1344,1330,1318],
+    insight:"프로필렌 원가 연동성이 높고 중국 ABS·합성섬유 수요가 하방을 지지해 S2에서는 완만한 강세 구도가 유지됩니다."},
+  bpa:{label:"BPA", unit:"$/mt", category:"downstream", current:1075,
+    S1:[1092.5,1082.5,1067.5,1052.5,1039.5,1028.5,1019.5,1012.5,1006.5,1001.5,997.5,994.5,991.5], S2:[1107.5,1128,1144.5,1154.5,1157.5,1152.5,1142.5,1131.5,1121.5,1112.5,1105.5,1099.5,1094.5], S3:[1140,1190.5,1230,1262.5,1287,1298,1295,1283,1265,1248,1235,1225,1217],
+    insight:"벤젠·아세톤 복합 원가와 4~5월 보수 시즌이 겹치며 S2에서 W4~W8 이중 압박 구간이 형성됩니다."},
+  mma:{label:"MMA", unit:"$/mt", category:"downstream", current:1680,
+    S1:[1702.5,1692.5,1672.5,1650.5,1630.5,1612.5,1596.5,1583.5,1571.5,1562.5,1554.5,1548.5,1543.5], S2:[1725,1765,1805.5,1836,1853,1853,1839,1819,1802,1787,1775,1766,1758], S3:[1780,1895,1988,2063,2118,2148,2138,2108,2068,2033,2005,1983,1966],
+    insight:"프로필렌과 메탄올 영향을 받으며 2분기 건축·도료 성수기 수요 방어가 더해져 S2에서도 고가가 유지됩니다."},
+  abs:{label:"ABS", unit:"$/mt", category:"polymers", current:1365,
+    S1:[1400,1392,1380,1366,1352,1340,1332,1325,1320,1316,1313,1311,1310], S2:[1415,1445,1475,1498,1511,1513,1505,1492,1477,1463,1452,1444,1438], S3:[1445,1512.5,1578,1633,1672.5,1697.5,1694.5,1677.5,1652.5,1627.5,1607.5,1592.5,1580.5],
+    insight:"SM·BD·AN 3원료 상승이 누적 반영되며 S2는 원가 전가 지연으로 W1~W4 마진이 가장 악화되고, S3는 공급·수요 양방향 붕괴 위험이 있습니다."}
+};
+
+const colors = {
+  S1: "rgba(34,197,94,1)",
+  S2: "rgba(245,158,11,1)",
+  S3: "rgba(239,68,68,1)",
+  fillS1: "rgba(34,197,94,.12)",
+  fillS2: "rgba(245,158,11,.14)",
+  fillS3: "rgba(239,68,68,.12)"
+};
+
+let state = {
+  selectedScenario: "S2",
+  oilChartType: "curve",
+  productChartType: "curve",
+  selectedProduct: "naphtha",
+  selectedWeek: "W1",
+  categoryFilter: "all",
+  visibleProducts: ["naphtha","ethylene","benzene","styrene","butadiene","abs"]
+};
+
+let oilChart, productChart, multiChart;
+
+function fmt(v){
+  return Number(v).toLocaleString(undefined,{maximumFractionDigits:1});
+}
+function pct(v){
+  const sign = v > 0 ? "+" : "";
+  return sign + v.toFixed(1) + "%";
+}
+function riskLevel(productKey, value){
+  const thresholds = {
+    brent:[95,105,115], naphtha:[820,900,1000], ethylene:[1000,1100,1200], propylene:[1000,1100,1200],
+    benzene:[980,1030,1080], styrene:[1220,1320,1420], butadiene:[1600,1800,1950],
+    an:[1180,1260,1360], bpa:[1110,1180,1260], mma:[1760,1860,2000], abs:[1450,1520,1620]
+  };
+  const [c,w,c2] = thresholds[productKey];
+  if(value >= c2) return {label:"CRITICAL", cls:"critical"};
+  if(value >= w) return {label:"WARNING", cls:"warning"};
+  if(value >= c) return {label:"CAUTION", cls:"caution"};
+  return {label:"NORMAL", cls:"normal"};
+}
+function commandSummary(){
+  if(state.selectedScenario === "S3"){
+    return {
+      headline:`확전 장기화 국면. ${state.selectedWeek} 기준 방어적 구매와 가동률 하향 검토 우선`,
+      action:"권고 액션: 원료 조달선 다변화, 고원가 노출 품목 판가 전가, 비핵심 운전 탄력조정 검토",
+      watch:"다음 체크포인트: 호르무즈 실통항, 사우디/UAE 피격, 보험 인수 재개 여부"
+    };
+  }
+  if(state.selectedScenario === "S2"){
+    return {
+      headline:`교착 지속 국면. ${state.selectedWeek} 기준 고원가 고착 대응 필요`,
+      action:"권고 액션: BD·SM·ABS 등 고노출 체인 중심 재고와 마진 동시 관리",
+      watch:"다음 체크포인트: 대체 나프타 도착 시점, 크래커 2차 감산, 하류 판가 전가 속도"
+    };
+  }
+  return {
+    headline:`조기 완화 시나리오. ${state.selectedWeek} 기준 피크아웃 가능성 점검`,
+    action:"권고 액션: 과도한 공황구매보다 단계적 구매 복귀와 재고 정상화 검토",
+    watch:"다음 체크포인트: 호위 재개, 협상 수용, 비축유 방출 효과의 실물 반영 여부"
+  };
+}
+function selectedWeekIndex(){ return weeks.indexOf(state.selectedWeek); }
+
+function buildScenarioButtons(){
+  const box = document.getElementById("scenarioButtons");
+  box.innerHTML = "";
+  Object.entries(scenarios).forEach(([k,v])=>{
+    const b = document.createElement("button");
+    b.className = "btn" + (state.selectedScenario===k ? " active":"");
+    b.textContent = `${v.label} · ${v.probability}`;
+    b.onclick = ()=>{ state.selectedScenario = k; renderAll(); };
+    box.appendChild(b);
+  });
+}
+function buildWeekButtons(){
+  const box = document.getElementById("weekButtons");
+  box.innerHTML = "";
+  weeks.forEach(w=>{
+    const b = document.createElement("button");
+    b.className = "btn" + (state.selectedWeek===w ? " active":"");
+    b.textContent = w;
+    b.onclick = ()=>{ state.selectedWeek = w; renderAll(); };
+    box.appendChild(b);
+  });
+}
+function buildProductSelect(){
+  const sel = document.getElementById("productSelect");
+  sel.innerHTML = "";
+  Object.entries(products).filter(([k])=>k!=="brent").forEach(([k,v])=>{
+    const op = document.createElement("option");
+    op.value = k; op.textContent = v.label;
+    if(state.selectedProduct===k) op.selected = true;
+    sel.appendChild(op);
+  });
+  sel.onchange = e=>{ state.selectedProduct = e.target.value; renderAll(); };
+}
+function buildMultiToggles(){
+  const box = document.getElementById("multiProductToggles");
+  box.innerHTML = "";
+  Object.entries(products).filter(([k])=>k!=="brent").forEach(([k,v])=>{
+    const b = document.createElement("button");
+    b.className = "btn" + (state.visibleProducts.includes(k) ? " active":"");
+    b.textContent = v.label;
+    b.onclick = ()=>{
+      if(state.visibleProducts.includes(k)){
+        if(state.visibleProducts.length === 1) return;
+        state.visibleProducts = state.visibleProducts.filter(x=>x!==k);
+      }else{
+        state.visibleProducts.push(k);
+      }
+      renderAll();
+    };
+    box.appendChild(b);
+  });
+}
+function buildCategoryButtons(){
+  const cats = [
+    ["all","전체"],["feedstock","원료"],["olefin","올레핀"],["aromatics","아로마틱"],
+    ["derivatives","중간유도품"],["downstream","하류원료"],["polymers","폴리머"]
+  ];
+  const box = document.getElementById("categoryButtons");
+  box.innerHTML = "";
+  cats.forEach(([key,label])=>{
+    const b = document.createElement("button");
+    b.className = "btn" + (state.categoryFilter===key ? " active":"");
+    b.textContent = label;
+    b.onclick = ()=>{ state.categoryFilter = key; renderAll(); };
+    box.appendChild(b);
+  });
+}
+function activateChips(selector, value, attr){
+  document.querySelectorAll(selector).forEach(el=>{
+    el.classList.toggle("active", el.getAttribute(attr)===value);
+    el.onclick = ()=>{
+      if(attr==="data-oil-type") state.oilChartType = el.getAttribute(attr);
+      if(attr==="data-product-type") state.productChartType = el.getAttribute(attr);
+      renderAll();
+    };
+  });
+}
+
+function updateHeaderAndScenario(){
+  document.getElementById("kpiScenario").textContent = state.selectedScenario;
+  document.getElementById("kpiScenarioLabel").textContent = scenarios[state.selectedScenario].label.replace(/^S\d\s/, "");
+  document.getElementById("scenarioDescTitle").textContent = `${scenarios[state.selectedScenario].label} · 확률 ${scenarios[state.selectedScenario].probability}`;
+  document.getElementById("scenarioSummary").textContent = scenarios[state.selectedScenario].summary;
+
+  const assumptions = document.getElementById("assumptionTags");
+  assumptions.innerHTML = "";
+  scenarios[state.selectedScenario].assumption.forEach(t=>{
+    const span = document.createElement("span");
+    span.className = "tag";
+    span.textContent = t;
+    assumptions.appendChild(span);
+  });
+  const triggerList = document.getElementById("triggerList");
+  triggerList.innerHTML = "";
+  scenarios[state.selectedScenario].triggers.forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "summary-box";
+    div.style.marginTop = "8px";
+    div.textContent = t;
+    triggerList.appendChild(div);
+  });
+
+  const c = commandSummary();
+  document.getElementById("commandHeadline").textContent = c.headline;
+  document.getElementById("commandAction").textContent = c.action;
+  document.getElementById("commandWatch").textContent = c.watch;
+}
+
+function updateMetrics(){
+  const idx = selectedWeekIndex();
+  const p = products[state.selectedProduct];
+  const oilValue = products.brent[state.selectedScenario][idx];
+  const s1 = p.S1[idx], s2 = p.S2[idx], s3 = p.S3[idx];
+  const avg = ((s1+s2+s3)/3).toFixed(1);
+
+  document.getElementById("selectedWeekText").textContent = `선택 주차: ${state.selectedWeek} · ${dateLabels[state.selectedWeek]}`;
+  document.getElementById("metricOil").textContent = fmt(oilValue);
+  document.getElementById("metricOilSub").textContent = `${state.selectedScenario} · $/bbl`;
+  document.getElementById("metricAvg").textContent = fmt(avg);
+  document.getElementById("metricAvgSub").textContent = p.unit;
+  document.getElementById("metricS1").textContent = fmt(s1);
+  document.getElementById("metricS1Sub").textContent = p.unit;
+  document.getElementById("metricS2").textContent = fmt(s2);
+  document.getElementById("metricS2Sub").textContent = p.unit;
+  document.getElementById("metricS3").textContent = fmt(s3);
+  document.getElementById("metricS3Sub").textContent = p.unit;
+
+  const r1 = riskLevel("brent", oilValue);
+  const oilBox = document.getElementById("riskOilBox");
+  oilBox.className = `metric bg-${r1.cls}`;
+  document.getElementById("riskOilValue").textContent = fmt(oilValue);
+  document.getElementById("riskOilLabel").innerHTML = `${state.selectedWeek} · <span class="warn-${r1.cls}">${r1.label}</span>`;
+
+  const r2 = riskLevel(state.selectedProduct, s2);
+  const pBox = document.getElementById("riskProductBox");
+  pBox.className = `metric bg-${r2.cls}`;
+  document.getElementById("riskProductValue").textContent = fmt(s2);
+  document.getElementById("riskProductLabel").innerHTML = `${p.label} · <span class="warn-${r2.cls}">${r2.label}</span>`;
+}
+
+function updateProductInsight(){
+  const p = products[state.selectedProduct];
+  const current = p.current;
+  const w13 = p[state.selectedScenario][12];
+  const cpct = ((w13-current)/current)*100;
+  const peak = Math.max(...p[state.selectedScenario]);
+  const trough = Math.min(...p[state.selectedScenario]);
+  const peakWeek = weeks[p[state.selectedScenario].indexOf(peak)];
+
+  document.getElementById("insightTitle").textContent = `${p.label} · ${p.unit}`;
+  document.getElementById("insightCurrent").textContent = fmt(current);
+  document.getElementById("insightW13").textContent = fmt(w13);
+  document.getElementById("insightW13Sub").textContent = `${state.selectedScenario} W13`;
+  document.getElementById("insightPct").textContent = pct(cpct);
+  document.getElementById("insightPct").style.color = cpct >= 0 ? "#fca5a5" : "#86efac";
+  document.getElementById("insightPeak").textContent = fmt(peak);
+  document.getElementById("insightPeakSub").textContent = peakWeek;
+  document.getElementById("insightText").textContent = p.insight;
+  document.getElementById("insightRange").innerHTML = `선택 시나리오 범위 · 최저 <b>${fmt(trough)}</b> / 최고 <b>${fmt(peak)}</b>`;
+}
+
+function renderSummaryTable(){
+  const body = document.getElementById("summaryTableBody");
+  body.innerHTML = "";
+  Object.entries(products)
+    .filter(([k])=>k!=="brent")
+    .filter(([k,v])=>state.categoryFilter==="all" || v.category===state.categoryFilter)
+    .forEach(([k,v])=>{
+      const tr = document.createElement("tr");
+      const s1 = v.S1[12], s2 = v.S2[12], s3 = v.S3[12];
+      const s2pct = ((s2-v.current)/v.current)*100;
+      tr.innerHTML = `
+        <td>${v.label}</td>
+        <td>${fmt(v.current)}</td>
+        <td>${fmt(s1)}</td>
+        <td>${fmt(s2)}</td>
+        <td>${fmt(s3)}</td>
+        <td style="color:${s2pct>=0 ? "#fca5a5" : "#86efac"}; font-weight:700">${pct(s2pct)}</td>
+      `;
+      body.appendChild(tr);
+    });
+}
+
+function renderWeeklyTable(){
+  const p = products[state.selectedProduct];
+  const body = document.getElementById("weeklyTableBody");
+  body.innerHTML = "";
+  weeks.forEach((w,idx)=>{
+    const s1 = p.S1[idx], s2 = p.S2[idx], s3 = p.S3[idx], avg = ((s1+s2+s3)/3).toFixed(1);
+    const tr = document.createElement("tr");
+    if(w===state.selectedWeek) tr.className = "hl";
+    tr.innerHTML = `
+      <td>${w}</td>
+      <td>${dateLabels[w]}</td>
+      <td>${fmt(s1)}</td>
+      <td>${fmt(s2)}</td>
+      <td>${fmt(s3)}</td>
+      <td><b>${fmt(avg)}</b></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function makeDataset(label, data, color, typeMode){
+  const isBar = typeMode === "bar";
+  const straight = typeMode === "line";
+  return {
+    label,
+    data,
+    type: isBar ? "bar" : "line",
+    borderColor: color,
+    backgroundColor: color.replace(",1)", isBar ? ",0.55)" : ",0.14)"),
+    fill: !isBar && !straight,
+    tension: isBar ? 0 : (straight ? 0 : 0.35),
+    borderWidth: 2.5,
+    pointRadius: isBar ? 0 : 2.5
+  };
+}
+
+function renderOilChart(){
+  if(oilChart) oilChart.destroy();
+  const data = products.brent[state.selectedScenario];
+  oilChart = new Chart(document.getElementById("oilChart"), {
+    type: state.oilChartType === "bar" ? "bar" : "line",
+    data: {
+      labels: weeks,
+      datasets: [makeDataset(`${scenarios[state.selectedScenario].label} Brent`, data, colors[state.selectedScenario], state.oilChartType)]
+    },
+    options: chartOptions()
+  });
+}
+function renderProductChart(){
+  if(productChart) productChart.destroy();
+  const p = products[state.selectedProduct];
+  productChart = new Chart(document.getElementById("productChart"), {
+    type: state.productChartType === "bar" ? "bar" : "line",
+    data: {
+      labels: weeks,
+      datasets: [
+        makeDataset("S1", p.S1, colors.S1, state.productChartType),
+        makeDataset("S2", p.S2, colors.S2, state.productChartType),
+        makeDataset("S3", p.S3, colors.S3, state.productChartType)
+      ]
+    },
+    options: chartOptions()
+  });
+}
+function renderMultiChart(){
+  if(multiChart) multiChart.destroy();
+  const palette = [
+    "rgba(34,197,94,1)","rgba(96,165,250,1)","rgba(245,158,11,1)","rgba(239,68,68,1)",
+    "rgba(34,211,238,1)","rgba(168,85,247,1)","rgba(244,114,182,1)","rgba(250,204,21,1)"
+  ];
+  const datasets = state.visibleProducts.map((key, i) => {
+    return makeDataset(products[key].label, products[key][state.selectedScenario], palette[i % palette.length], state.productChartType);
+  });
+  multiChart = new Chart(document.getElementById("multiChart"), {
+    type: state.productChartType === "bar" ? "bar" : "line",
+    data: { labels: weeks, datasets },
+    options: chartOptions()
+  });
+}
+
+function chartOptions(){
+  return {
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: { labels: { color: "#dbe7fa" } },
+      tooltip: {
+        backgroundColor: "rgba(7,17,31,.96)",
+        borderColor: "#2b3d5a",
+        borderWidth: 1,
+        titleColor: "#ffffff",
+        bodyColor: "#dbe7fa"
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: "#9db0cf" },
+        grid: { color: "rgba(157,176,207,.10)" }
+      },
+      y: {
+        ticks: { color: "#9db0cf" },
+        grid: { color: "rgba(157,176,207,.10)" }
+      }
+    }
+  };
+}
+
+function renderAll(){
+  buildScenarioButtons();
+  buildWeekButtons();
+  buildProductSelect();
+  buildMultiToggles();
+  buildCategoryButtons();
+  activateChips("[data-oil-type]", state.oilChartType, "data-oil-type");
+  activateChips("[data-product-type]", state.productChartType, "data-product-type");
+  updateHeaderAndScenario();
+  updateMetrics();
+  updateProductInsight();
+  renderSummaryTable();
+  renderWeeklyTable();
+  renderOilChart();
+  renderProductChart();
+  renderMultiChart();
+}
+
+renderAll();
+</script>
+</body>
+</html>
