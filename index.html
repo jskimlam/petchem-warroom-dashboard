@@ -240,6 +240,7 @@
     <div class="card" style="margin-top:16px">
       <div class="section-title">멀티 품목 워룸 비교</div>
       <div class="section-desc">선택 시나리오 기준으로 여러 품목을 ON / OFF 하여 동시에 비교</div>
+      <div class="toolbar" style="margin-bottom:10px"><button class="btn" id="multiOffBtn">전체 OFF</button><div style="color:var(--muted); font-size:12px">현재 선택 품목은 자동 유지</div></div>
       <div class="toggle-wrap" id="multiProductToggles"></div>
       <div class="canvas-box large" style="margin-top:14px"><canvas id="multiChart"></canvas></div>
     </div>
@@ -252,7 +253,7 @@
 
     <div class="card" style="margin-top:16px">
       <div class="section-title">주차별 평균값 테이블</div>
-      <div class="section-desc">선택 품목의 W1~W13 시나리오별 가격 및 평균값</div>
+      <div class="section-desc" id="weeklyTableDesc">현재 선택 품목의 W1~W13 시나리오별 가격 및 평균값</div>
       <div style="overflow:auto">
         <table class="data-table">
           <thead>
@@ -271,9 +272,10 @@
     </div>
 
     <div class="card" style="margin-top:16px">
-      <div class="section-title">사용 메모</div>
-      <div class="footer-note">
-        이 단일 HTML 파일은 별도 빌드 없이 브라우저에서 바로 열 수 있습니다. 차트는 CDN으로 불러오는 Chart.js를 사용하므로 인터넷 연결 상태에서 여는 것을 권장합니다.
+      <div class="section-title">사전 안내</div>
+      <div class="footer-note" style="font-size:13px; color:#dbe7fa;">
+        AI를 통해 딥리서치하여 회귀분석 및 과거 사례를 연구해 작성한 예상가격입니다.<br>
+        예상가격인 만큼 실제 시장과 차이가 발생할 수 있음을 사전 공지합니다.
       </div>
     </div>
   </div>
@@ -446,7 +448,7 @@ function buildProductSelect(){
     if(state.selectedProduct===k) op.selected = true;
     sel.appendChild(op);
   });
-  sel.onchange = e=>{ state.selectedProduct = e.target.value; renderAll(); };
+  sel.onchange = e=>{ state.selectedProduct = e.target.value; if(!state.visibleProducts.includes(state.selectedProduct)) state.visibleProducts.push(state.selectedProduct); renderAll(); };
 }
 function buildMultiToggles(){
   const box = document.getElementById("multiProductToggles");
@@ -454,9 +456,10 @@ function buildMultiToggles(){
   Object.entries(products).filter(([k])=>k!=="wti").forEach(([k,v])=>{
     const b = document.createElement("button");
     b.className = "btn" + (state.visibleProducts.includes(k) ? " active":"");
-    b.textContent = v.label;
+    b.textContent = v.label + (state.selectedProduct === k ? " · 선택품목" : "");
     b.onclick = ()=>{
       if(state.visibleProducts.includes(k)){
+        if(k === state.selectedProduct) return;
         if(state.visibleProducts.length === 1) return;
         state.visibleProducts = state.visibleProducts.filter(x=>x!==k);
       }else{
@@ -472,6 +475,15 @@ function activateChips(selector, value, attr, setter){
     el.classList.toggle("active", el.getAttribute(attr)===value);
     el.onclick = ()=>{ setter(el.getAttribute(attr)); };
   });
+}
+
+function wireMultiOffButton(){
+  const btn = document.getElementById("multiOffBtn");
+  if(!btn) return;
+  btn.onclick = ()=>{
+    state.visibleProducts = [state.selectedProduct];
+    renderAll();
+  };
 }
 
 function updateHeaderAndScenario(){
@@ -559,6 +571,9 @@ function updateProductInsight(){
   document.getElementById("insightPeakSub").textContent = peakWeek;
   document.getElementById("insightText").textContent = p.insight;
   document.getElementById("insightRange").innerHTML = `선택 시나리오 범위 · 최저 <b>${fmt(trough)}</b> / 최고 <b>${fmt(peak)}</b>`;
+  const weeklyDesc = document.getElementById("weeklyTableDesc");
+  if(weeklyDesc) weeklyDesc.textContent = `${p.label}의 W1~W13 시나리오별 가격 및 평균값`;
+
 }
 
 function renderWeeklyTable(){
@@ -723,6 +738,7 @@ function renderAll(){
   buildWeekButtons();
   buildProductSelect();
   buildMultiToggles();
+  wireMultiOffButton();
   activateChips("[data-oil-type]", state.oilChartType, "data-oil-type", (v)=>{ state.oilChartType=v; renderAll(); });
   activateChips("[data-product-type]", state.productChartType, "data-product-type", (v)=>{ state.productChartType=v; renderAll(); });
   activateChips("[data-label-toggle]", state.showLabels ? "on" : "off", "data-label-toggle", (v)=>{ state.showLabels=(v==="on"); renderAll(); });
