@@ -196,17 +196,22 @@
         <div id="triggerList" style="margin-top:8px"></div>
       </div>
       <div class="card">
-        <div class="section-title">상황판 핵심 숫자</div>
-        <div class="section-desc">선택 주차 기준 WTI와 선택 품목의 시나리오별 값 및 평균값</div>
+        <div class="section-title">주차별 핵심 숫자</div>
+        <div class="section-desc">선택 주차 기준 WTI / 나프타 / 스티렌 / ABS 가격과 핵심 스프레드</div>
         <div class="weekbar" id="weekButtons"></div>
         <div style="margin-top:10px; color:var(--muted); font-size:13px" id="selectedWeekText"></div>
-        <div class="metrics" style="margin-top:14px">
+        <div class="metrics" style="margin-top:14px; grid-template-columns:repeat(4,1fr)">
           <div class="metric"><div class="m1">WTI</div><div class="m2" id="metricOil"></div><div class="m3" id="metricOilSub"></div></div>
-          <div class="metric"><div class="m1" id="metricAvgTitle">선택 품목 평균값</div><div class="m2" id="metricAvg"></div><div class="m3" id="metricAvgSub"></div></div>
-          <div class="metric"><div class="m1" id="metricS1Title">조기종전 가격</div><div class="m2" id="metricS1"></div><div class="m3" id="metricS1Sub"></div></div>
-          <div class="metric"><div class="m1" id="metricS2Title">교착유지 가격</div><div class="m2" id="metricS2"></div><div class="m3" id="metricS2Sub"></div></div>
-          <div class="metric"><div class="m1" id="metricS3Title">확전·장기화 가격</div><div class="m2" id="metricS3"></div><div class="m3" id="metricS3Sub"></div></div>
+          <div class="metric"><div class="m1">나프타 가격</div><div class="m2" id="metricNaphtha"></div><div class="m3" id="metricNaphthaSub"></div></div>
+          <div class="metric"><div class="m1">스티렌 가격</div><div class="m2" id="metricStyrene"></div><div class="m3" id="metricStyreneSub"></div></div>
+          <div class="metric"><div class="m1">ABS 가격</div><div class="m2" id="metricABS"></div><div class="m3" id="metricABSSub"></div></div>
+          <div class="metric"><div class="m1">BZ 가격</div><div class="m2" id="metricBZ"></div><div class="m3" id="metricBZSub"></div></div>
+          <div class="metric"><div class="m1">SM-BZ 스프레드</div><div class="m2" id="metricSMBZSpread"></div><div class="m3" id="metricSMBZSpreadSub"></div></div>
+          <div class="metric"><div class="m1">ABS Cost</div><div class="m2" id="metricABSCost"></div><div class="m3" id="metricABSCostSub"></div></div>
+          <div class="metric"><div class="m1">ABS-Cost 스프레드</div><div class="m2" id="metricABSSpread"></div><div class="m3" id="metricABSSpreadSub"></div></div>
         </div>
+      </div>
+    </div>
       </div>
     </div>
 
@@ -518,26 +523,42 @@ function updateHeaderAndScenario(){
 
 function updateMetrics(){
   const idx = selectedWeekIndex();
-  const p = products[state.selectedProduct];
   const oilValue = products.wti[state.selectedScenario][idx];
-  const s1 = p.S1[idx], s2 = p.S2[idx], s3 = p.S3[idx];
-  const avg = ((s1+s2+s3)/3).toFixed(1);
+  const naphtha = products.naphtha[state.selectedScenario][idx];
+  const styrene = products.styrene[state.selectedScenario][idx];
+  const abs = products.abs[state.selectedScenario][idx];
+  const bz = products.benzene[state.selectedScenario][idx];
+  const an = products.an[state.selectedScenario][idx];
+  const bd = products.butadiene[state.selectedScenario][idx];
+  const smBzSpread = styrene - bz;
+  const absCost = styrene * 0.6 + an * 0.25 + bd * 0.15;
+  const absSpread = abs - absCost;
 
-  document.getElementById("selectedWeekText").textContent = `선택 주차: ${state.selectedWeek} · ${dateLabels[state.selectedWeek]}`;
+  document.getElementById("selectedWeekText").textContent = `선택 주차: ${state.selectedWeek} · ${dateLabels[state.selectedWeek]} · ${scenarios[state.selectedScenario].label}`;
   document.getElementById("metricOil").textContent = fmt(oilValue);
   document.getElementById("metricOilSub").textContent = `${scenarios[state.selectedScenario].label} · $/bbl`;
-  document.getElementById("metricAvgTitle").textContent = `${p.label} 평균값`;
-  document.getElementById("metricAvg").textContent = fmt(avg);
-  document.getElementById("metricAvgSub").textContent = p.unit;
-  document.getElementById("metricS1Title").textContent = `조기종전 ${p.label} 가격`;
-  document.getElementById("metricS2Title").textContent = `교착유지 ${p.label} 가격`;
-  document.getElementById("metricS3Title").textContent = `확전·장기화 ${p.label} 가격`;
-  document.getElementById("metricS1").textContent = fmt(s1);
-  document.getElementById("metricS1Sub").textContent = p.unit;
-  document.getElementById("metricS2").textContent = fmt(s2);
-  document.getElementById("metricS2Sub").textContent = p.unit;
-  document.getElementById("metricS3").textContent = fmt(s3);
-  document.getElementById("metricS3Sub").textContent = p.unit;
+
+  document.getElementById("metricNaphtha").textContent = fmt(naphtha);
+  document.getElementById("metricNaphthaSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
+
+  document.getElementById("metricStyrene").textContent = fmt(styrene);
+  document.getElementById("metricStyreneSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
+
+  document.getElementById("metricABS").textContent = fmt(abs);
+  document.getElementById("metricABSSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
+
+  document.getElementById("metricBZ").textContent = fmt(bz);
+  document.getElementById("metricBZSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
+
+  document.getElementById("metricSMBZSpread").textContent = fmt(smBzSpread);
+  document.getElementById("metricSMBZSpreadSub").textContent = `스티렌 - 벤젠 · $/mt`;
+
+  document.getElementById("metricABSCost").textContent = fmt(absCost);
+  document.getElementById("metricABSCostSub").textContent = `SM*0.6 + AN*0.25 + BD*0.15`;
+
+  document.getElementById("metricABSSpread").textContent = fmt(absSpread);
+  document.getElementById("metricABSSpread").style.color = absSpread >= 0 ? "#86efac" : "#fca5a5";
+  document.getElementById("metricABSSpreadSub").textContent = `ABS - Cost · $/mt`;
 
   const r1 = riskLevel("wti", oilValue);
   const oilBox = document.getElementById("riskOilBox");
@@ -545,11 +566,11 @@ function updateMetrics(){
   document.getElementById("riskOilValue").textContent = fmt(oilValue);
   document.getElementById("riskOilLabel").innerHTML = `${state.selectedWeek} · <span class="warn-${r1.cls}">${r1.label}</span>`;
 
-  const r2 = riskLevel(state.selectedProduct, s2);
+  const r2 = riskLevel("abs", abs);
   const pBox = document.getElementById("riskProductBox");
   pBox.className = `metric bg-${r2.cls}`;
-  document.getElementById("riskProductValue").textContent = fmt(s2);
-  document.getElementById("riskProductLabel").innerHTML = `${p.label} · <span class="warn-${r2.cls}">${r2.label}</span>`;
+  document.getElementById("riskProductValue").textContent = fmt(abs);
+  document.getElementById("riskProductLabel").innerHTML = `ABS · <span class="warn-${r2.cls}">${r2.label}</span>`;
 }
 
 function updateProductInsight(){
