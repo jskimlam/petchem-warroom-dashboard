@@ -116,10 +116,38 @@
     .month-card .mth{font-size:12px; color:var(--muted)}
     .month-card .val{font-size:28px; font-weight:800; margin-top:8px}
     .month-card .subt{font-size:12px; color:#b1c3e3; margin-top:6px; line-height:1.5}
+
+    .market-btn{background:linear-gradient(180deg,#1d3352,#11243b); border-color:#6ea8ff}
+    .modal-overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.62); backdrop-filter:blur(3px);
+      display:none; align-items:center; justify-content:center; z-index:9999; padding:24px;
+    }
+    .modal-overlay.show{display:flex}
+    .modal{
+      width:min(1080px,96vw); max-height:90vh; overflow:auto;
+      border-radius:22px; border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(17,31,51,.98), rgba(9,18,31,.98));
+      box-shadow:0 24px 80px rgba(0,0,0,.42); padding:20px;
+    }
+    .modal-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:14px}
+    .modal-title{font-size:24px; font-weight:800}
+    .modal-close{
+      border:1px solid #3b4f70; background:#0e1a2d; color:var(--text);
+      border-radius:12px; padding:10px 14px; cursor:pointer; font-size:13px;
+    }
+    .scenario-panels{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+    .scenario-panel{
+      border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.04); padding:14px;
+    }
+    .scenario-panel h4{margin:0 0 8px; font-size:16px}
+    .scenario-panel .meta{font-size:12px; color:var(--muted); margin-bottom:10px}
+    .scenario-panel .body{font-size:13px; line-height:1.7; color:#dbe7fa; white-space:pre-wrap}
+
     @media (max-width:1200px){
       .grid-4,.metrics,.grid-2,.grid-main,.two-col,.month-grid{grid-template-columns:1fr 1fr}
     }
     @media (max-width:900px){
+      .scenario-panels{grid-template-columns:1fr}
       .grid-4,.metrics,.grid-2,.grid-main,.two-col,.month-grid{grid-template-columns:1fr}
       h1{font-size:28px}
       .metric .m2,.kpi .value,.month-card .val{font-size:26px}
@@ -130,23 +158,23 @@
   <div class="wrap">
     <div class="header">
       <div class="pill">● PETCHEM WAR ROOM · EMERGENCY BOARD</div>
-      <h1>[WarRoom] 이란리스크 시나리오별 사전원가 overview (3/6일자 기준)</h1>
+      <h1>[WarRoom] 이란리스크 시나리오별 사전원가 overview (3/15일자 기준)</h1>
       <div class="sub">
         미-이스라엘-이란 전쟁 시나리오 기반 상황판입니다. 시나리오, 주차, 품목, 그래프 유형을 직접 조작하며
-        WTI와 주요 원료·유도품의 13주 평균 경로를 비교할 수 있습니다.
+        Brent와 주요 원료·유도품의 13주 평균 경로를 비교할 수 있습니다.
       </div>
     </div>
 
     <div class="grid grid-4" style="margin-top:16px">
       <div class="card kpi"><div class="label">기준 시나리오</div><div class="value" id="kpiScenario">교착유지</div><div class="subv" id="kpiScenarioLabel">교착 유지</div></div>
-      <div class="card kpi"><div class="label">전망 기간</div><div class="value">13주</div><div class="subv">2026.03.09 ~ 2026.06.05</div></div>
-      <div class="card kpi"><div class="label">기준 WTI</div><div class="value">$90.90</div><div class="subv">기준 시점</div></div>
-      <div class="card kpi"><div class="label">대상 품목</div><div class="value">10개</div><div class="subv">나프타 ~ ABS</div></div>
+      <div class="card kpi"><div class="label">전망 기간</div><div class="value">13주</div><div class="subv">2026.03.16 ~ 2026.06.08</div></div>
+      <div class="card kpi"><div class="label">기준 Brent</div><div class="value">$98.71</div><div class="subv">W2 실측 현재가</div></div>
+      <div class="card kpi"><div class="label">대상 품목</div><div class="value">10개</div><div class="subv">에틸렌 ~ PC GP</div></div>
     </div>
 
     <div class="grid grid-2" style="margin-top:16px">
       <div class="card">
-        <div class="section-title">시장 상황 요약</div>
+        <div class="section-title">지휘관 요약</div>
         <div class="section-desc">현재 선택 시나리오와 주차 기준 즉시 판단 포인트</div>
         <div class="summary-box" id="commandHeadline"></div>
         <div class="summary-box" id="commandAction" style="margin-top:10px"></div>
@@ -172,10 +200,10 @@
 
     <div class="card" style="margin-top:16px">
       <div class="section-title">시나리오 선택</div>
-      <div class="section-desc">조기종전 / 교착유지 / 확전·장기화 전환과 WTI 차트 조작 · 가격표시 ON 시 라벨이 그래프와 겹치지 않도록 띄워 표시</div>
+      <div class="section-desc">조기종전 / 교착유지 / 확전·장기화 전환과 Brent 차트 조작 · 가격표시 ON 시 라벨이 그래프와 겹치지 않도록 띄워 표시</div>
       <div class="toolbar" id="scenarioButtons"></div>
       <div class="toolbar" style="margin-top:10px">
-        <span style="color:var(--muted); font-size:13px">WTI 그래프</span>
+        <span style="color:var(--muted); font-size:13px">Brent 그래프</span>
         <button class="chip" data-oil-type="curve">곡선</button>
         <button class="chip" data-oil-type="line">선</button>
         <button class="chip" data-oil-type="bar">막대</button>
@@ -197,16 +225,16 @@
       </div>
       <div class="card">
         <div class="section-title">주차별 핵심 숫자</div>
-        <div class="section-desc">선택 주차 기준 WTI / 나프타 / 스티렌 / ABS 가격과 핵심 스프레드</div>
+        <div class="section-desc">선택 주차 기준 Brent / 에틸렌 / 스티렌 / ABS / BD / AN 가격과 ABS 핵심 스프레드</div>
         <div class="weekbar" id="weekButtons"></div>
         <div style="margin-top:10px; color:var(--muted); font-size:13px" id="selectedWeekText"></div>
         <div class="metrics" style="margin-top:14px; grid-template-columns:repeat(4,1fr)">
-          <div class="metric"><div class="m1">WTI</div><div class="m2" id="metricOil"></div><div class="m3" id="metricOilSub"></div></div>
-          <div class="metric"><div class="m1">나프타 가격</div><div class="m2" id="metricNaphtha"></div><div class="m3" id="metricNaphthaSub"></div></div>
+          <div class="metric"><div class="m1">Brent</div><div class="m2" id="metricOil"></div><div class="m3" id="metricOilSub"></div></div>
+          <div class="metric"><div class="m1">에틸렌 가격</div><div class="m2" id="metricNaphtha"></div><div class="m3" id="metricNaphthaSub"></div></div>
           <div class="metric"><div class="m1">스티렌 가격</div><div class="m2" id="metricStyrene"></div><div class="m3" id="metricStyreneSub"></div></div>
           <div class="metric"><div class="m1">ABS 가격</div><div class="m2" id="metricABS"></div><div class="m3" id="metricABSSub"></div></div>
-          <div class="metric"><div class="m1">BZ 가격</div><div class="m2" id="metricBZ"></div><div class="m3" id="metricBZSub"></div></div>
-          <div class="metric"><div class="m1">SM-BZ 스프레드</div><div class="m2" id="metricSMBZSpread"></div><div class="m3" id="metricSMBZSpreadSub"></div></div>
+          <div class="metric"><div class="m1">BD 가격</div><div class="m2" id="metricBZ"></div><div class="m3" id="metricBZSub"></div></div>
+          <div class="metric"><div class="m1">AN 가격</div><div class="m2" id="metricSMBZSpread"></div><div class="m3" id="metricSMBZSpreadSub"></div></div>
           <div class="metric"><div class="m1">ABS Cost</div><div class="m2" id="metricABSCost"></div><div class="m3" id="metricABSCostSub"></div></div>
           <div class="metric"><div class="m1">ABS-Cost 스프레드</div><div class="m2" id="metricABSSpread"></div><div class="m3" id="metricABSSpreadSub"></div></div>
         </div>
@@ -224,6 +252,7 @@
           <button class="chip" data-product-type="curve">곡선</button>
           <button class="chip" data-product-type="line">선</button>
           <button class="chip" data-product-type="bar">막대</button>
+          <button class="btn market-btn" id="marketViewBtn">시황 보기</button>
         </div>
         <div class="canvas-box large" style="margin-top:14px"><canvas id="productChart"></canvas></div>
       </div>
@@ -233,7 +262,7 @@
         <div class="section-desc" id="insightTitle"></div>
         <div class="metrics" style="grid-template-columns:1fr 1fr; gap:12px">
           <div class="metric"><div class="m1">현재가</div><div class="m2" id="insightCurrent"></div><div class="m3">기준값</div></div>
-          <div class="metric"><div class="m1">W13</div><div class="m2" id="insightW13"></div><div class="m3" id="insightW13Sub"></div></div>
+          <div class="metric"><div class="m1">W15</div><div class="m2" id="insightW13"></div><div class="m3" id="insightW13Sub"></div></div>
           <div class="metric"><div class="m1">현재 대비</div><div class="m2" id="insightPct"></div><div class="m3">선택 시나리오</div></div>
           <div class="metric"><div class="m1">피크</div><div class="m2" id="insightPeak"></div><div class="m3" id="insightPeakSub"></div></div>
         </div>
@@ -273,7 +302,7 @@
 
     <div class="card" style="margin-top:16px">
       <div class="section-title">월별 평균가격</div>
-      <div class="section-desc">선택 품목의 시나리오별 월평균 추정치입니다. 6월은 W13 한 주만 반영합니다.</div>
+      <div class="section-desc">선택 품목의 시나리오별 월평균 추정치입니다. 6월은 W14~W15 평균을 반영합니다.</div>
       <div class="month-grid" id="monthlyCards"></div>
     </div>
 
@@ -309,73 +338,73 @@
 <script>
 Chart.register(ChartDataLabels);
 
-const weeks = ["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13"];
+const weeks = ["W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13","W14","W15"];
 const dateLabels = {
-  W1: "3/09~3/14", W2: "3/16~3/21", W3: "3/23~3/28", W4: "3/30~4/04", W5: "4/07~4/11",
-  W6: "4/14~4/18", W7: "4/21~4/25", W8: "4/28~5/02", W9: "5/05~5/09", W10: "5/12~5/16",
-  W11: "5/19~5/23", W12: "5/26~5/30", W13: "6/01~6/05"
+  W3: "3/16~3/21", W4: "3/23~3/28", W5: "3/30~4/04", W6: "4/07~4/11", W7: "4/14~4/18",
+  W8: "4/21~4/25", W9: "4/27~5/01", W10: "5/04~5/08", W11: "5/11~5/15", W12: "5/18~5/22",
+  W13: "5/25~5/29", W14: "6/01~6/05", W15: "6/08~6/12"
 };
 const monthMap = {
-  "3월": ["W1","W2","W3","W4"],
-  "4월": ["W5","W6","W7","W8"],
-  "5월": ["W9","W10","W11","W12"],
-  "6월": ["W13"]
+  "3월": ["W3","W4","W5"],
+  "4월": ["W6","W7","W8","W9"],
+  "5월": ["W10","W11","W12","W13"],
+  "6월": ["W14","W15"]
 };
 const scenarios = {
   S1: {
-    label: "조기종전", probability: "20%", duration: "약 3~4주",
-    summary: "3~4주 내 호르무즈 통행 일부 재개, 6~8주 내 실질 완화. W4 이후 공급 회복 신호가 가격 안정화로 이어지는 시나리오.",
-    assumption: ["재보험 지원으로 해운사 3~4주 내 부분 복귀","이란 신정부 협상 수용 가능성 확대","IEA 비축유 방출 + OPEC+ 증산 효과 동시 반영","W6~W7부터 올레핀 가격 하락 전환"],
-    triggers: ["미 해군 호르무즈 일부 호위 재개","이란 신정부 협상 수용 신호","보험 인수 재개 및 탱커 복귀"]
+    label: "조기종전", probability: "15%", duration: "약 3~4주",
+    summary: "W3~W4 미-이란 외교 복원과 호르무즈 전면 허용을 전제로 하며, 크래커 재가동은 W5~W6, 실질 정상화는 6월 말로 보는 시나리오입니다.",
+    assumption: ["W3~W4 미-이란 외교 복원","호르무즈 전면 허용","크래커 재가동 W5~W6","6월 말 완전 회복"],
+    triggers: ["외교 채널 복원 확인","호르무즈 전면 통행 허용","크래커 재가동 결정"]
   },
   S2: {
-    label: "교착유지", probability: "55%", duration: "약 6~10주",
-    summary: "봉쇄 6~10주 지속, 13주 내 뚜렷한 해소 없음. 대체 물량은 늦게 도착하고 하류는 원가 전가에 실패하며 마진이 최악으로 악화되는 기준 시나리오.",
-    assumption: ["IRGC 잔존 세력의 해협 위협 지속","보험 재개 불발, 해운 중단 장기화","대체 물량 도착은 W6~W8 이후","W3~W4 아시아 크래커 2차 감산 발생"],
-    triggers: ["한국 크래커 2차 셧다운 확대","IEA 비축유 방출에도 실물 완화 제한","대체 나프타 도착 지연 또는 규모 부족"]
+    label: "교착유지", probability: "65%", duration: "약 6~10주",
+    summary: "중립국 선박 한정 통행, IEA 4억bbl 방출 W6~W7 효과, 한국 크래커 2차 감산 W3~W4, CPDC 복귀 W6, 대체 나프타 도착 W8~W9를 전제로 한 기준 시나리오입니다.",
+    assumption: ["중립국 선박 한정 통행","IEA 4억bbl 방출 W6~W7 효과","한국 크래커 2차 감산 W3~W4","대체 나프타 도착 W8~W9"],
+    triggers: ["Formosa 4~5월 보수","CPDC 복귀 W6","대체 나프타 도착 W8~W9"]
   },
   S3: {
-    label: "확전·장기화", probability: "25%", duration: "13주 이상",
-    summary: "사우디·UAE 인프라 추가 피격, 기뢰 부설 등으로 공급 위기가 13주 내내 심화되는 시나리오. 유가와 원료 가격이 역사적 고점권으로 진입.",
-    assumption: ["사우디/아람코·UAE 인프라 2차 타격","호르무즈 기뢰 부설로 물리적 통항 불가 전환","러시아산 대체 나프타 차단 가능성","ABS·MMA 등 하류 생산 채산성 붕괴"],
-    triggers: ["사우디 아람코 추가 피격","기뢰 부설 확인 보도","러·중의 간접 개입 및 제재 확대"]
+    label: "확전·장기화", probability: "20%", duration: "13주 이상",
+    summary: "이란의 Ras Tanura 타격 또는 호르무즈 완전 봉쇄를 상정하며, Brent 130달러+, 크래커 가동률 30~40%대, 수요 파괴 후 자가 균형을 전제로 합니다.",
+    assumption: ["사우디 Ras Tanura 타격 가능성","호르무즈 완전 봉쇄","Brent 130달러+","크래커 가동률 30~40%대"],
+    triggers: ["사우디 타격 여부","완전 봉쇄 확인","수요 파괴 후 고점 형성"]
   }
 };
 
 const products = {
-  wti:{label:"WTI", unit:"$/bbl", category:"oil", current:90.90,
-    S1:[92,94,93,91,88,85,83,81,79,78,77,76,76], S2:[93,98,102,104,105,103,101,99,98,97,96,96,96], S3:[95,108,118,124,128,130,128,126,122,118,116,115,115],
-    insight:"WTI는 전체 원가 체인의 선행 지표 역할을 하며, S2에서는 96달러 부근 고착, S3에서는 115달러 이상 고점권이 유지됩니다."},
-  naphtha:{label:"나프타", unit:"$/mt", category:"feedstock", current:776,
-    S1:[805,815,810,800,788,775,760,748,735,726,718,712,708], S2:[825,870,900,915,920,910,896,882,870,860,852,845,840], S3:[860,935,1000,1065,1095,1105,1095,1085,1055,1029,1012.5,1000,990],
-    insight:"호르무즈 직접 통과 물량 차단 영향이 가장 직접적이며 S2에서 W2~W5 고점 형성, S3에서는 아시아 크래커 손익분기점을 크게 상회합니다."},
-  ethylene:{label:"에틸렌", unit:"$/mt", category:"olefin", current:975,
-    S1:[985,975,955,935,915,890,870,850,833,820,809,799,791], S2:[1010,1045,1070,1080,1087.5,1075,1055,1035,1018,1003,990,980,972], S3:[1050,1145,1220,1270,1310,1330,1320,1300,1270,1240,1220,1205,1192],
-    insight:"나프타 대비 2주가량 지연 반영되며 S2에서는 930~1,050달러 고착, S3에서는 2008년 이후 최고가 영역 가능성이 제시됩니다."},
-  propylene:{label:"프로필렌", unit:"$/mt", category:"olefin", current:975,
-    S1:[985,965,940,917,897,876,859,845,832,821,812,804,798], S2:[1012.5,1047.5,1072.5,1082.5,1087,1077.5,1058.5,1040.5,1023.5,1008.5,995.5,985.5,976.5], S3:[1057.5,1152.5,1227.5,1280,1320,1335,1325,1305,1275,1248,1228,1213,1200],
-    insight:"PDH 마진 악화로 하방 지지력이 더 강하고, RFCC 재가동 이후에도 구조적 부족이 지속되는 설정입니다."},
-  benzene:{label:"벤젠", unit:"$/mt", category:"aromatics", current:967,
-    S1:[967.5,957.5,945.5,930.5,912.5,894.5,878.5,866.5,855.5,846.5,838.5,832.5,827.5], S2:[980,992.5,1001.5,1003.5,1000,992,980,968,957,946,938,932,926], S3:[1015,1050,1081.5,1104,1120.5,1127.5,1120.5,1107.5,1089.5,1072.5,1060.5,1052.5,1045.5],
-    insight:"중동 직수출 영향은 제한적이지만 원가·심리 급등과 보수 시즌이 겹치며 S2에서도 타이트한 구간이 유지됩니다."},
-  styrene:{label:"스티렌", unit:"$/mt", category:"derivatives", current:1171,
-    S1:[1180,1170,1155,1137,1118,1100,1083,1069,1058,1048,1039,1032,1026], S2:[1195,1220,1247.5,1268,1278,1275,1262,1245,1230,1216,1204,1195,1187], S3:[1225,1290,1360,1420,1462.5,1487.5,1482.5,1462.5,1435.5,1410.5,1390.5,1374.5,1362.5],
-    insight:"에틸렌+벤젠 복합 원가 구조로 2~3주 지연 반영되며 S2는 W3~W6 정점, S3는 1,500달러 접근이 가능한 고가 구간입니다."},
-  butadiene:{label:"부타디엔", unit:"$/mt", category:"derivatives", current:1500,
-    S1:[1540,1535,1525,1512,1496,1479,1462,1448,1436,1426,1418,1412,1407], S2:[1580,1660,1725,1765,1785,1775,1755,1733,1713,1696,1682,1671,1662], S3:[1655,1800,1915,1990,2040,2060,2050,2020,1980,1943,1912,1888,1868],
-    insight:"C4 스트림 감산이 직접 반영돼 충격이 가장 큰 제품군이며 S2에서 1,700달러, S3에서 2,000달러 부근까지 열려 있습니다."},
-  an:{label:"AN", unit:"$/mt", category:"downstream", current:1120,
-    S1:[1135,1125,1110,1092,1075,1059,1046,1035,1026,1019,1013,1008,1004], S2:[1155,1190,1220.5,1239,1247,1241,1227,1211,1197,1185,1175,1167,1160], S3:[1190,1265,1330,1382.5,1420,1435,1428,1410,1385,1362,1344,1330,1318],
-    insight:"프로필렌 원가 연동성이 높고 중국 ABS·합성섬유 수요가 하방을 지지해 S2에서는 완만한 강세 구도가 유지됩니다."},
-  bpa:{label:"BPA", unit:"$/mt", category:"downstream", current:1075,
-    S1:[1092.5,1082.5,1067.5,1052.5,1039.5,1028.5,1019.5,1012.5,1006.5,1001.5,997.5,994.5,991.5], S2:[1107.5,1128,1144.5,1154.5,1157.5,1152.5,1142.5,1131.5,1121.5,1112.5,1105.5,1099.5,1094.5], S3:[1140,1190.5,1230,1262.5,1287,1298,1295,1283,1265,1248,1235,1225,1217],
-    insight:"벤젠·아세톤 복합 원가와 4~5월 보수 시즌이 겹치며 S2에서 W4~W8 이중 압박 구간이 형성됩니다."},
-  mma:{label:"MMA", unit:"$/mt", category:"downstream", current:1680,
-    S1:[1702.5,1692.5,1672.5,1650.5,1630.5,1612.5,1596.5,1583.5,1571.5,1562.5,1554.5,1548.5,1543.5], S2:[1725,1765,1805.5,1836,1853,1853,1839,1819,1802,1787,1775,1766,1758], S3:[1780,1895,1988,2063,2118,2148,2138,2108,2068,2033,2005,1983,1966],
-    insight:"프로필렌과 메탄올 영향을 받으며 2분기 건축·도료 성수기 수요 방어가 더해져 S2에서도 고가가 유지됩니다."},
-  abs:{label:"ABS", unit:"$/mt", category:"polymers", current:1365,
-    S1:[1400,1392,1380,1366,1352,1340,1332,1325,1320,1316,1313,1311,1310], S2:[1415,1445,1475,1498,1511,1513,1505,1492,1477,1463,1452,1444,1438], S3:[1445,1512.5,1578,1633,1672.5,1697.5,1694.5,1677.5,1652.5,1627.5,1607.5,1592.5,1580.5],
-    insight:"SM·BD·AN 3원료 상승이 누적 반영되며 S2는 원가 전가 지연으로 W1~W4 마진이 가장 악화되고, S3는 공급·수요 양방향 붕괴 위험이 있습니다."}
+  brent:{label:"Brent", unit:"$/bbl", category:"oil", current:98.71,
+    S1:[96,92,88,84,81,79,77,76,75,74,73,72,71], S2:[102,106,109,108,106,104,102,100,99,98,97,96,95], S3:[110,118,124,130,133,135,134,132,130,128,126,124,122],
+    insight:"Brent W2 실측은 98.71달러이며, 교착 시나리오에서는 100달러 안팎 고착, 확전 시에는 130달러 이상 급등 구간을 상정합니다."},
+  ethylene:{label:"에틸렌", unit:"$/mt", category:"olefin", current:1400.0,
+    S1:[1280,1200,1120,1060,1010,975,945,920,900,888,875,862,850], S2:[1420,1440,1450,1430,1400,1370,1340,1310,1280,1255,1235,1215,1200], S3:[1550,1650,1720,1780,1820,1850,1870,1880,1870,1855,1840,1820,1800],
+    insight:"W3~W5 고점 형성 후 IEA 방출 실물 효과와 대체 원료 도착 시점에 따라 완만한 안정화가 진행되는 구조입니다."},
+  propylene:{label:"프로필렌", unit:"$/mt", category:"olefin", current:1150.0,
+    S1:[1060,990,930,880,845,815,790,775,762,750,740,732,725], S2:[1170,1190,1200,1185,1165,1145,1125,1105,1085,1065,1048,1032,1020], S3:[1300,1380,1440,1490,1525,1550,1565,1575,1565,1552,1538,1522,1505],
+    insight:"크래커 부산물 감소와 PDH 가동률 변수의 영향을 함께 받으며, W5 이후 점진적 정상화가 핵심 경로입니다."},
+  styrene:{label:"스티렌", unit:"$/mt", category:"derivatives", current:1275.0,
+    S1:[1180,1100,1020,958,905,865,835,812,795,782,772,765,760], S2:[1310,1345,1370,1355,1330,1305,1278,1250,1225,1202,1182,1165,1150], S3:[1450,1555,1645,1720,1782,1830,1862,1882,1870,1852,1832,1808,1780],
+    insight:"벤젠·에틸렌 원가 체인과 중국 화동 현물 변동성이 직접 반영되는 핵심 제품으로, 교착 시 W5까지 고점 압력이 남아 있습니다."},
+  butadiene:{label:"부타디엔", unit:"$/mt", category:"derivatives", current:2100.0,
+    S1:[1900,1780,1650,1540,1460,1390,1340,1300,1275,1255,1240,1228,1218], S2:[2150,2200,2230,2210,2180,2145,2105,2065,2025,1990,1960,1935,1915], S3:[2380,2520,2640,2730,2790,2830,2850,2855,2842,2825,2805,2780,2752],
+    insight:"크래커 C4 부산물 구조상 공급 타이트가 가장 심한 제품군이며, W3~W5 패닉 바잉 이후 하류 감산이 가격 상단을 제어합니다."},
+  an:{label:"AN", unit:"$/mt", category:"downstream", current:1555.0,
+    S1:[1430,1330,1240,1170,1118,1078,1048,1025,1008,995,985,978,972], S2:[1580,1610,1630,1615,1595,1572,1548,1522,1496,1472,1452,1435,1420], S3:[1760,1880,1975,2050,2105,2145,2170,2182,2170,2155,2138,2118,2095],
+    insight:"CPDC 복귀 시점과 프로필렌 원가가 핵심 변수이며, ABS 가동률 하락이 오히려 AN 수요 파괴를 통해 상단을 제한할 수 있습니다."},
+  bpa:{label:"BPA", unit:"$/mt", category:"downstream", current:1635.0,
+    S1:[1510,1412,1320,1248,1192,1148,1115,1090,1072,1058,1048,1040,1034], S2:[1660,1690,1708,1692,1672,1648,1622,1595,1568,1544,1522,1504,1488], S3:[1840,1960,2058,2138,2198,2242,2272,2288,2278,2262,2244,2222,2198],
+    insight:"벤젠·아세톤 복합 원가와 PC 체인 스프레드가 핵심이며, W5 고점 후 원가 안정화에 따라 점진 하락이 예상됩니다."},
+  mma:{label:"MMA", unit:"$/mt", category:"downstream", current:1930.0,
+    S1:[1780,1660,1555,1472,1408,1358,1318,1288,1265,1248,1235,1225,1218], S2:[1960,1995,2015,1998,1975,1948,1918,1886,1854,1825,1800,1778,1760], S3:[2170,2318,2438,2538,2615,2672,2712,2738,2728,2712,2692,2668,2640],
+    insight:"메탄올·아세톤·이소부틸렌 등 원료 전방위 급등 영향이 반영된 상태이며, Sales Control 해제 시점이 하락 전환의 관건입니다."},
+  abs:{label:"ABS", unit:"$/mt", category:"polymers", current:1875.0,
+    S1:[1730,1618,1518,1435,1368,1315,1272,1240,1215,1196,1182,1170,1162], S2:[1905,1938,1958,1942,1920,1895,1866,1836,1805,1778,1754,1734,1718], S3:[2108,2252,2375,2478,2558,2620,2665,2695,2682,2665,2645,2622,2595],
+    insight:"SM·BD·AN 3대 원료 동반 급등에도 buy-sell gap과 하류 저항으로 가격 전가가 제한되며, 마진 압축이 먼저 나타나는 구조입니다."},
+  pc_optical:{label:"PC Optical", unit:"$/mt", category:"polymers", current:2350.0,
+    S1:[2168,2025,1898,1792,1708,1638,1582,1540,1510,1488,1472,1460,1452], S2:[2385,2428,2452,2432,2405,2372,2335,2295,2255,2220,2190,2165,2145], S3:[2640,2818,2968,3092,3185,3258,3308,3338,3322,3302,3278,3250,3218],
+    insight:"BPA 직결 원가 구조이나 고사양 계약 비중이 높아 GP Moulding 대비 하락 속도가 상대적으로 느린 편입니다."},
+  pc_gp:{label:"PC GP", unit:"$/mt", category:"polymers", current:2030.0,
+    S1:[1872,1748,1638,1548,1475,1415,1368,1332,1305,1285,1270,1258,1250], S2:[2060,2095,2115,2098,2072,2042,2008,1972,1936,1904,1876,1852,1834], S3:[2282,2438,2568,2678,2762,2830,2878,2908,2892,2872,2848,2820,2788],
+    insight:"BPA 연동성이 높고 스팟 유동성이 Optical 대비 커서 시장 변동에 더 민감하게 반응하는 제품입니다."},
 };
 
 const colors = {
@@ -388,13 +417,66 @@ let state = {
   selectedScenario: "S2",
   oilChartType: "curve",
   productChartType: "curve",
-  selectedProduct: "naphtha",
-  selectedWeek: "W1",
-  visibleProducts: ["naphtha","ethylene","benzene","styrene","butadiene","abs"],
+  selectedProduct: "abs",
+  selectedWeek: "W3",
+  visibleProducts: ["ethylene","styrene","butadiene","an","abs","pc_optical"],
   showLabels: false
 };
 
 let oilChart, productChart, multiChart;
+
+const marketComments = {
+  "ethylene": {
+    "조기종전": "가격 방향: ② 가격 경로: 외교 해결 소식 자체가 선물 시장에서 즉각 하방 압력으로 작용해 W3부터 하락이 시작된다.\n\n핵심 변수: ① 현황 및 전제: W3~W4 미-이란 외교 채널이 복원되고 호르무즈 통행이 전면 허용될 경우, 중동산 나프타 선적이 즉시 재개되며 아시아 크래커에 대한 원료 공급 압박이 빠르게 해소된다.\n\n시사점: ② 가격 경로: 외교 해결 소식 자체가 선물 시장에서 즉각 하방 압력으로 작용해 W3부터 하락이 시작된다.",
+    "교착유지": "가격 방향: ① 현황 및 전제: 중립국(터키·중국) 선박에 한정된 부분 통행이 유지되는 교착 상태로, 한국·일본·대만 크래커의 나프타 조달 차질이 W5까지 지속된다.\n\n핵심 변수: 롯데케미칼 대산 크래커 가동률은 70% 수준에서 정체.\n\n시사점: 롯데케미칼 대산 크래커 가동률은 70% 수준에서 정체.",
+    "확전·장기화": "가격 방향: ② 가격 경로: Brent $130 이상 급등으로 나프타가 $1,200+에 진입하면 크래커 가동률이 30~40%대로 붕괴하고, 에틸렌 공급은 절반 이하로 감소한다.\n\n핵심 변수: ① 현황 및 전제: 이란의 사우디 Ras Tanura 또는 Jubail 석유화학 단지에 대한 미사일 타격, 혹은 호르무즈 해협의 완전 봉쇄가 실현될 경우 중동발 나프타·에탄 공급이 전면 차단된다.\n\n시사점: ② 가격 경로: Brent $130 이상 급등으로 나프타가 $1,200+에 진입하면 크래커 가동률이 30~40%대로 붕괴하고, 에틸렌 공급은 절반 이하로 감소한다."
+  },
+  "propylene": {
+    "조기종전": "가격 방향: 중국 내수 과잉 물량의 역외 수출 재개로 아시아 스팟 가격이 추가 하방 압력을 받아 W15 기준 $725까지 하락한다.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 조기 종전 시 중동산 LPG(프로판) 공급이 정상화되면서 PDH(프로판 탈수소화) 플랜트의 원가 부담이 즉각 해소된다.\n\n시사점: 중국 PDH 가동률이 현재 66.5%에서 W6 이후 85% 이상으로 회복된다.",
+    "교착유지": "가격 방향: ① 현황 및 전제: 크래커 감산으로 인한 크래커 부산물 프로필렌 감소와 PDH 가동률 66.5% 유지가 동시에 작용해 공급 이중 압박이 W5까지 지속된다.\n\n핵심 변수: ① 현황 및 전제: 크래커 감산으로 인한 크래커 부산물 프로필렌 감소와 PDH 가동률 66.5% 유지가 동시에 작용해 공급 이중 압박이 W5까지 지속된다.\n\n시사점: ① 현황 및 전제: 크래커 감산으로 인한 크래커 부산물 프로필렌 감소와 PDH 가동률 66.5% 유지가 동시에 작용해 공급 이중 압박이 W5까지 지속된다.",
+    "확전·장기화": "가격 방향: 중국 PP 수입 의존도가 낮아 중국 내수 프로필렌 수요는 비교적 안정적으로 유지되나, 수출 차단으로 인한 역내 잉여 물량 처리 문제가 발생한다.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 LPG(프로판) 수출이 전면 차단되어 아시아 PDH 플랜트 가동이 불가능해진다.\n\n시사점: 중국 coal-to-propylene(CTP) 설비가 긴급 가동에 들어가지만, 기존 가동률이 이미 높아 추가 여력이 크지 않다."
+  },
+  "styrene": {
+    "조기종전": "가격 방향: 주간 고점 CFR China $1,400으로 2022년 7월 이후 최고치를 기록했으나 조기 종전 시 벤젠·에틸렌 가격이 동반 하락하면서 SM 원가가 급격히 낮아진다.\n\n핵심 변수: 하류 PS/EPS/ABS 공장들이 재고 보충 수요를 재개하는 시점(W5~W6 예상)이 단기 반등의 트리거가 될 수 있다.\n\n시사점: SM 선물 시장의 투기적 포지션 청산이 집중되면 일시적으로 과도한 가격 급락이 발생할 수 있으니 구매 타이밍 분산이 필요하다.",
+    "교착유지": "가격 방향: ② 가격 경로: W3 $1,310 → W5 고점 $1,370까지 상승 후 IEA 방출 효과가 나프타·벤젠에 반영되는 W6~W7부터 점진 하락.\n\n핵심 변수: 호르무즈 교착으로 중동 나프타→벤젠·에틸렌 공급 차질이 SM 원가를 끌어올리는 상황이 W5까지 지속된다.\n\n시사점: ③ 핵심 변수: 중국 SM 3월 평균 가동률 하락(국내 크래커 원료 차질)이 공급 측 지지 요인으로 작용한다.",
+    "확전·장기화": "가격 방향: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 중동 나프타 공급이 전면 차단되어 벤젠·에틸렌 모두 원가 급등.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 중동 나프타 공급이 전면 차단되어 벤젠·에틸렌 모두 원가 급등.\n\n시사점: 중국도 나프타 기반 SM 장치의 원료 차질로 자국 내 공급이 급감한다."
+  },
+  "butadiene": {
+    "조기종전": "가격 방향: 미리 패닉 바잉으로 확보된 재고 부담이 하류 수요를 일시 억제하면서 가격 하락 속도가 빨라진다.\n\n핵심 변수: 조기 종전 시 싱가포르·태국·대만 크래커들의 FM이 해제되고 나프타 공급 정상화로 크래커 C4 부산물인 BD 생산이 급속히 회복된다.\n\n시사점: ② 가격 경로: 크래커 재가동과 함께 BD 생산이 복구되는 W5~W6, 그리고 딥씨(deep-sea) 물량이 실제 도착하는 W6~W7에 가격이 급락한다.",
+    "교착유지": "가격 방향: ② 가격 경로: W3~W4 패닉 바잉으로 $2,150~$2,230까지 추가 상승 후 W5 고점 형성.\n\n핵심 변수: 산동 100kt/년 유닛 60% 가동, 일본 Chiba 95kt 보수 중.\n\n시사점: 하류 ABS 가동률 하락으로 BD 수요 자체가 수축하면서 W6~W7부터 완만한 하락이 시작된다.",
+    "확전·장기화": "가격 방향: 이 자기 균형 메커니즘이 $2,855 이상으로의 추가 상승을 억제하는 핵심 요인이다.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 중동산 나프타 공급 전면 차단으로 아시아 크래커 가동률이 30~40%대로 붕괴.\n\n시사점: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 중동산 나프타 공급 전면 차단으로 아시아 크래커 가동률이 30~40%대로 붕괴."
+  },
+  "an": {
+    "조기종전": "가격 방향: 조기 종전 시 C3(프로필렌) 가격 하락이 AN 원가에 직접 반영된다.\n\n핵심 변수: CPDC(대만)의 FM 해제와 Tongsuh 4호기 재가동이 W4~W5에 이뤄지면서 공급이 빠르게 회복된다.\n\n시사점: 한국 ABS 메이커의 긴급 스팟 구매 수요가 해소되면서 프리미엄이 소멸하고, C3 가격 하락 연동으로 W15 $972까지 수렴한다.",
+    "교착유지": "가격 방향: CPDC 복귀 협상이 W4~W5에 타결되고 실제 공급 재개가 W6부터 이뤄지면서 완만한 하락이 시작된다.\n\n핵심 변수: ① 현황 및 전제: CPDC Force Majeure(3/9 선언) + Tongsuh 4호기 비계획 정지로 3월 NE Asia AN 공급이 전주 대비 30% 이상 급감.\n\n시사점: 한국 ABS 메이커 계약물량 삭감 → 긴급 스팟 구매 경쟁 진행 중.",
+    "확전·장기화": "가격 방향: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 C3(프로필렌) 가격이 $1,500 이상으로 급등하면서 AN 제조원가가 $1,800 이상으로 상승.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 C3(프로필렌) 가격이 $1,500 이상으로 급등하면서 AN 제조원가가 $1,800 이상으로 상승.\n\n시사점: ② 가격 경로: W5~W6에서 $1,975~$2,050, W7~W8에서 $2,105~$2,182 극단 고점 형성."
+  },
+  "bpa": {
+    "조기종전": "가격 방향: 조기 종전 시 벤젠 가격 하락이 BPA 원가에 즉각 반영된다.\n\n핵심 변수: 벤젠-BPA 스프레드가 $600~$700으로 정상화되면서 아시아 BPA 플랜트 가동률이 W6 이후 회복된다.\n\n시사점: 벤젠-BPA 스프레드가 $600~$700으로 정상화되면서 아시아 BPA 플랜트 가동률이 W6 이후 회복된다.",
+    "교착유지": "가격 방향: ① 현황 및 전제: 벤젠·아세톤 동반 급등으로 BPA 제조원가가 2주 연속 20% 상승.\n\n핵심 변수: 아시아 BPA 플랜트 가동률 소폭 하향.\n\n시사점: 아시아 BPA 플랜트 가동률 소폭 하향.",
+    "확전·장기화": "가격 방향: 벤젠 FOB Korea가 $2,000 이상으로 급등하면서 BPA 원가가 $1,900 이상으로 상승하고, 여기에 아세톤 급등이 추가로 원가를 압박한다.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 중동산 벤젠·사우디 SAMAC BPA 공급이 전면 차단된다.\n\n시사점: ② 가격 경로: W5~W6에서 $2,058~$2,138, W7~W8에서 $2,198~$2,288 극단 고점 형성."
+  },
+  "mma": {
+    "조기종전": "가격 방향: 메탄올·아세톤·이소부틸렌 등 MMA 원료 전방위 급등 중.\n\n핵심 변수: 메탄올·아세톤·이소부틸렌 등 MMA 원료 전방위 급등 중.\n\n시사점: 조기 종전 시 메탄올(중동 생산 비중 높음)과 아세톤 가격이 동반 하락하면서 MMA 원가가 빠르게 정상화된다.",
+    "교착유지": "가격 방향: ① 현황 및 전제: 메탄올·아세톤·이소부틸렌 등 MMA 원료 전방위 급등으로 아시아 MMA 생산업체들이 Sales Control(공급 통제)을 강화 중.\n\n핵심 변수: ① 현황 및 전제: 메탄올·아세톤·이소부틸렌 등 MMA 원료 전방위 급등으로 아시아 MMA 생산업체들이 Sales Control(공급 통제)을 강화 중.\n\n시사점: 중국 MMA 플랜트들의 가동률 회복이 스팟 공급 정상화의 첫 신호가 될 것이며, 중국 플랜트 가동률 모니터링이 필수다.",
+    "확전·장기화": "가격 방향: PMMA 가격이 $4,000 이상으로 급등하면서 광학용·건축용 아크릴 패널 생산이 중단되고 MMA 수요 자체가 급감하기 시작한다.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 이란산 메탄올(글로벌 공급의 15~20%)이 차단되고, 사우디 아세톤 공급도 차질을 빚는다.\n\n시사점: ② 가격 경로: W5~W6에서 $2,438~$2,538, W7~W8에서 $2,615~$2,738 극단 고점 형성."
+  },
+  "abs": {
+    "조기종전": "가격 방향: SM·BD·AN 3대 원료 동반 급등으로 원가 구조 완전 붕괴 상태.\n\n핵심 변수: SM·BD·AN 3대 원료 동반 급등으로 원가 구조 완전 붕괴 상태.\n\n시사점: 구매자들이 현재 수준에서 구매를 거부하고 있어(buy-sell gap 확대) 공급자들이 먼저 가격을 인하해야 거래가 이뤄지는 구조.",
+    "교착유지": "가격 방향: ① 현황 및 전제: SM·BD·AN 3대 원료 동반 급등으로 원가 구조 붕괴.\n\n핵심 변수: ① 현황 및 전제: SM·BD·AN 3대 원료 동반 급등으로 원가 구조 붕괴.\n\n시사점: 중국 ABS 평균 가동률 55.7%(전주 64%에서 급락).",
+    "확전·장기화": "가격 방향: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 SM·BD·AN 모두 극단적 공급 붕괴를 겪으면서 ABS 생산 원가가 현재 대비 30~40% 추가 상승.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 SM·BD·AN 모두 극단적 공급 붕괴를 겪으면서 ABS 생산 원가가 현재 대비 30~40% 추가 상승.\n\n시사점: 중국 ABS 가동률 50% 이하 붕괴는 불가피하며 한국·대만 ABS 메이커들은 원료 조달 자체가 불가능해진다."
+  },
+  "pc_optical": {
+    "조기종전": "가격 방향: BPA 직결 원가 구조이므로 조기 종전 시 벤젠→BPA→PC 연쇄 하락이 발생한다.\n\n핵심 변수: W15 $1,452까지 복귀.\n\n시사점: BPA-PC 스프레드 $715는 현재 건전권이나, BPA 가격 하락 속도가 PC보다 빠를 경우 PC 생산 인센티브가 일시적으로 개선된다.",
+    "교착유지": "가격 방향: NE Asia 주요 PC 플랜트 가동률은 안정적이나 BPA 공급 차질 시 연쇄 감산 리스크 상존.\n\n핵심 변수: NE Asia 주요 PC 플랜트 가동률은 안정적이나 BPA 공급 차질 시 연쇄 감산 리스크 상존.\n\n시사점: NE Asia 주요 PC 플랜트 가동률은 안정적이나 BPA 공급 차질 시 연쇄 감산 리스크 상존.",
+    "확전·장기화": "가격 방향: 이것이 확전 시나리오에서 PC가 ABS·BD 대비 더 오랜 기간 고점을 유지하는 구조적 이유다.\n\n핵심 변수: ① 현황 및 전제: 호르무즈 완전 봉쇄 시 BPA 공급이 전면 붕괴하면서 PC 생산을 위한 BPA 조달이 불가능해진다.\n\n시사점: 구매 관점에서 $3,000 이상의 장기 계약은 대체재 전환 리스크를 반드시 감안해야 한다."
+  },
+  "pc_gp": {
+    "조기종전": "가격 방향: 조기 종전 시 BPA 하락 연동이 즉각적이며, GP Moulding은 스팟 거래 비중이 Optical보다 높아 가격 조정 속도가 빠르다.\n\n핵심 변수: 가전·자동차 고객들의 재고 소진 후 재발주가 W5~W6에 집중되는 구조여서 단기 반등 구간이 형성될 수 있다.\n\n시사점: 조기 종전 시 BPA 하락 연동이 즉각적이며, GP Moulding은 스팟 거래 비중이 Optical보다 높아 가격 조정 속도가 빠르다.",
+    "교착유지": "가격 방향: ① 현황 및 전제: 가전·자동차 하류 수요 위축으로 BPA 급등분의 70~80%만 반영된 상태.\n\n핵심 변수: ① 현황 및 전제: 가전·자동차 하류 수요 위축으로 BPA 급등분의 70~80%만 반영된 상태.\n\n시사점: 하류 가전·IT 수요가 약세를 보이는 Q2에 수요 측 하방 압력도 추가된다.",
+    "확전·장기화": "가격 방향: 이 수요 파괴가 $3,000 이상으로의 추가 상승을 억제하는 핵심 메커니즘이며, W9~W10 이후 급락 전환 가능성에 대비한 구매 전략 수립이 필요하다.\n\n핵심 변수: ① 현황 및 전제: 확전 시 BPA 공급 붕괴로 PC GP 생산이 전면 중단.\n\n시사점: 이 수요 파괴가 $3,000 이상으로의 추가 상승을 억제하는 핵심 메커니즘이며, W9~W10 이후 급락 전환 가능성에 대비한 구매 전략 수립이 필요하다."
+  }
+};
 
 function fmt(v){
   return Number(v).toLocaleString(undefined,{maximumFractionDigits:1});
@@ -405,11 +487,12 @@ function pct(v){
 }
 function riskLevel(productKey, value){
   const thresholds = {
-    wti:[95,105,115], naphtha:[820,900,1000], ethylene:[1000,1100,1200], propylene:[1000,1100,1200],
-    benzene:[980,1030,1080], styrene:[1220,1320,1420], butadiene:[1600,1800,1950],
-    an:[1180,1260,1360], bpa:[1110,1180,1260], mma:[1760,1860,2000], abs:[1450,1520,1620]
+    brent:[100,115,130], ethylene:[1450,1650,1800], propylene:[1200,1400,1550],
+    styrene:[1350,1550,1800], butadiene:[2200,2500,2800], an:[1650,1900,2150],
+    bpa:[1700,2000,2250], mma:[2000,2350,2700], abs:[1950,2250,2600],
+    pc_optical:[2450,2850,3250], pc_gp:[2120,2450,2850]
   };
-  const [caution, warning, critical] = thresholds[productKey];
+  const [caution, warning, critical] = thresholds[productKey] || [Infinity, Infinity, Infinity];
   if(value >= critical) return {label:"CRITICAL", cls:"critical"};
   if(value >= warning) return {label:"WARNING", cls:"warning"};
   if(value >= caution) return {label:"CAUTION", cls:"caution"};
@@ -418,22 +501,22 @@ function riskLevel(productKey, value){
 function commandSummary(){
   if(state.selectedScenario === "S3"){
     return {
-      headline:`확전 장기화 국면. ${state.selectedWeek} 기준 방어적 구매와 가동률 하향 검토 우선`,
-      action:"권고 액션: 원료 조달선 다변화, 고원가 노출 품목 판가 전가, 비핵심 운전 탄력조정 검토",
-      watch:"다음 체크포인트: 호르무즈 실통항, 사우디/UAE 피격, 보험 인수 재개 여부"
+      headline:`확전·장기화 국면. ${state.selectedWeek} 기준 원료 확보와 감산 대응이 최우선입니다.`,
+      action:"권고 액션: 핵심 원료 단기 확보, 고원가 노출 체인 판매전략 재점검, 비경제 운전 최소화",
+      watch:"다음 체크포인트: Ras Tanura 타격 여부, Brent 130달러 상회, 크래커 가동률 30~40%대 진입"
     };
   }
   if(state.selectedScenario === "S2"){
     return {
-      headline:`교착 지속 국면. ${state.selectedWeek} 기준 고원가 고착 대응 필요`,
-      action:"권고 액션: BD·SM·ABS 등 고노출 체인 중심 재고와 마진 동시 관리",
-      watch:"다음 체크포인트: 대체 나프타 도착 시점, 크래커 2차 감산, 하류 판가 전가 속도"
+      headline:`교착유지 국면. ${state.selectedWeek} 기준 고원가 고착과 점진 안정화 경로를 함께 관리해야 합니다.`,
+      action:"권고 액션: BD·SM·ABS·PC 체인 중심 재고와 마진 동시 관리, 대체 원료 도착 일정 점검",
+      watch:"다음 체크포인트: IEA 방출 실물 효과, 한국 크래커 2차 감산, CPDC 복귀, 대체 나프타 W8~W9 도착"
     };
   }
   return {
-    headline:`조기 완화 시나리오. ${state.selectedWeek} 기준 피크아웃 가능성 점검`,
-    action:"권고 액션: 과도한 공황구매보다 단계적 구매 복귀와 재고 정상화 검토",
-    watch:"다음 체크포인트: 호위 재개, 협상 수용, 비축유 방출 효과의 실물 반영 여부"
+    headline:`조기종전 국면. ${state.selectedWeek} 기준 피크아웃 이후 하락 전환 속도를 점검하는 구간입니다.`,
+    action:"권고 액션: 과도한 고가 구매보다 분할 구매와 재고 정상화, 재가동 지연 리스크만 선별 관리",
+    watch:"다음 체크포인트: 외교 복원, 호르무즈 전면 허용, 크래커 재가동 W5~W6, 6월 말 정상화"
   };
 }
 function selectedWeekIndex(){ return weeks.indexOf(state.selectedWeek); }
@@ -544,14 +627,12 @@ function updateHeaderAndScenario(){
 
 function updateMetrics(){
   const idx = selectedWeekIndex();
-  const oilValue = products.wti[state.selectedScenario][idx];
-  const naphtha = products.naphtha[state.selectedScenario][idx];
+  const oilValue = products.brent[state.selectedScenario][idx];
+  const ethylene = products.ethylene[state.selectedScenario][idx];
   const styrene = products.styrene[state.selectedScenario][idx];
   const abs = products.abs[state.selectedScenario][idx];
-  const bz = products.benzene[state.selectedScenario][idx];
-  const an = products.an[state.selectedScenario][idx];
   const bd = products.butadiene[state.selectedScenario][idx];
-  const smBzSpread = styrene - bz;
+  const an = products.an[state.selectedScenario][idx];
   const absCost = styrene * 0.6 + an * 0.25 + bd * 0.15;
   const absSpread = abs - absCost;
 
@@ -559,7 +640,7 @@ function updateMetrics(){
   document.getElementById("metricOil").textContent = fmt(oilValue);
   document.getElementById("metricOilSub").textContent = `${scenarios[state.selectedScenario].label} · $/bbl`;
 
-  document.getElementById("metricNaphtha").textContent = fmt(naphtha);
+  document.getElementById("metricNaphtha").textContent = fmt(ethylene);
   document.getElementById("metricNaphthaSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
 
   document.getElementById("metricStyrene").textContent = fmt(styrene);
@@ -568,11 +649,11 @@ function updateMetrics(){
   document.getElementById("metricABS").textContent = fmt(abs);
   document.getElementById("metricABSSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
 
-  document.getElementById("metricBZ").textContent = fmt(bz);
+  document.getElementById("metricBZ").textContent = fmt(bd);
   document.getElementById("metricBZSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
 
-  document.getElementById("metricSMBZSpread").textContent = fmt(smBzSpread);
-  document.getElementById("metricSMBZSpreadSub").textContent = `스티렌 - 벤젠 · $/mt`;
+  document.getElementById("metricSMBZSpread").textContent = fmt(an);
+  document.getElementById("metricSMBZSpreadSub").textContent = `${scenarios[state.selectedScenario].label} · $/mt`;
 
   document.getElementById("metricABSCost").textContent = fmt(absCost);
   document.getElementById("metricABSCostSub").textContent = `SM*0.6 + AN*0.25 + BD*0.15`;
@@ -581,7 +662,7 @@ function updateMetrics(){
   document.getElementById("metricABSSpread").style.color = absSpread >= 0 ? "#86efac" : "#fca5a5";
   document.getElementById("metricABSSpreadSub").textContent = `ABS - Cost · $/mt`;
 
-  const r1 = riskLevel("wti", oilValue);
+  const r1 = riskLevel("brent", oilValue);
   const oilBox = document.getElementById("riskOilBox");
   oilBox.className = `metric bg-${r1.cls}`;
   document.getElementById("riskOilValue").textContent = fmt(oilValue);
@@ -606,7 +687,7 @@ function updateProductInsight(){
   document.getElementById("insightTitle").textContent = `${p.label} · ${p.unit}`;
   document.getElementById("insightCurrent").textContent = fmt(current);
   document.getElementById("insightW13").textContent = fmt(w13);
-  document.getElementById("insightW13Sub").textContent = `${scenarios[state.selectedScenario].label} W13`;
+  document.getElementById("insightW13Sub").textContent = `${scenarios[state.selectedScenario].label} W15`;
   document.getElementById("insightPct").textContent = pct(cpct);
   document.getElementById("insightPct").style.color = cpct >= 0 ? "#fca5a5" : "#86efac";
   document.getElementById("insightPeak").textContent = fmt(peak);
@@ -737,12 +818,12 @@ function commonOptions(){
 
 function renderOilChart(){
   if(oilChart) oilChart.destroy();
-  const data = products.wti[state.selectedScenario];
+  const data = products.brent[state.selectedScenario];
   oilChart = new Chart(document.getElementById("oilChart"), {
     type: state.oilChartType === "bar" ? "bar" : "line",
     data: {
       labels: weeks,
-      datasets: [makeDataset(`${scenarios[state.selectedScenario].label} WTI`, data, colors[state.selectedScenario], state.oilChartType)]
+      datasets: [makeDataset(`${scenarios[state.selectedScenario].label} Brent`, data, colors[state.selectedScenario], state.oilChartType)]
     },
     options: commonOptions()
   });
@@ -779,11 +860,51 @@ function renderMultiChart(){
   });
 }
 
+
+function updateMarketModalContent(){
+  const p = products[state.selectedProduct];
+  const title = document.getElementById("marketModalTitle");
+  const desc = document.getElementById("marketModalDesc");
+  const data = marketComments[state.selectedProduct] || {
+    "조기종전":"해당 품목의 시황 코멘트가 아직 정리되지 않았습니다.",
+    "교착유지":"해당 품목의 시황 코멘트가 아직 정리되지 않았습니다.",
+    "확전·장기화":"해당 품목의 시황 코멘트가 아직 정리되지 않았습니다."
+  };
+  if (title) title.textContent = `${p.label} 시나리오별 시황`;
+  if (desc) desc.textContent = `${p.label} 선택 기준 · 조기종전 / 교착유지 / 확전·장기화`;
+  const s1 = document.getElementById("marketCommentS1");
+  const s2 = document.getElementById("marketCommentS2");
+  const s3 = document.getElementById("marketCommentS3");
+  if (s1) s1.textContent = data["조기종전"];
+  if (s2) s2.textContent = data["교착유지"];
+  if (s3) s3.textContent = data["확전·장기화"];
+}
+
+function wireMarketModal(){
+  const modal = document.getElementById("marketModal");
+  const openBtn = document.getElementById("marketViewBtn");
+  const closeBtn = document.getElementById("marketModalClose");
+  if (openBtn && modal) {
+    openBtn.onclick = ()=>{
+      updateMarketModalContent();
+      modal.classList.add("show");
+    };
+  }
+  if (closeBtn && modal) closeBtn.onclick = ()=> modal.classList.remove("show");
+  if (modal) {
+    modal.onclick = (e)=>{
+      if (e.target === modal) modal.classList.remove("show");
+    };
+  }
+}
+
 function renderAll(){
   buildScenarioButtons();
   buildWeekButtons();
   buildProductSelect();
   buildMultiToggles();
+  wireMarketModal();
+  updateMarketModalContent();
   wireMultiOffButton();
   activateChips("[data-oil-type]", state.oilChartType, "data-oil-type", (v)=>{ state.oilChartType=v; renderAll(); });
   activateChips("[data-product-type]", state.productChartType, "data-product-type", (v)=>{ state.productChartType=v; renderAll(); });
@@ -800,5 +921,36 @@ function renderAll(){
 
 renderAll();
 </script>
+
+  <div class="modal-overlay" id="marketModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <div class="pill" style="margin-bottom:10px">● EXECUTIVE MARKET VIEW</div>
+          <div class="modal-title" id="marketModalTitle">품목 시나리오별 시황</div>
+          <div class="section-desc" id="marketModalDesc" style="margin:8px 0 0">선택 품목 기준 시나리오별 핵심 요약</div>
+        </div>
+        <button class="modal-close" id="marketModalClose">닫기</button>
+      </div>
+      <div class="scenario-panels">
+        <div class="scenario-panel">
+          <h4>조기종전</h4>
+          <div class="meta">핵심 요약</div>
+          <div class="body" id="marketCommentS1"></div>
+        </div>
+        <div class="scenario-panel">
+          <h4>교착유지</h4>
+          <div class="meta">핵심 요약</div>
+          <div class="body" id="marketCommentS2"></div>
+        </div>
+        <div class="scenario-panel">
+          <h4>확전·장기화</h4>
+          <div class="meta">핵심 요약</div>
+          <div class="body" id="marketCommentS3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
