@@ -185,7 +185,7 @@
   <div class="wrap">
     <div class="header">
       <div class="pill">● PETCHEM WAR ROOM · EMERGENCY BOARD</div>
-      <h1>[WarRoom] 이란리스크 시나리오별 사전원가 overview (3/15일자 기준)</h1>
+      <h1>[WarRoom] 이란리스크 시나리오별 사전원가 overview (W11 3/16일자 기준)</h1>
       <div class="sub">
         미-이스라엘-이란 전쟁 시나리오 기반 상황판입니다. 시나리오, 주차, 품목, 그래프 유형을 직접 조작하며
         Brent와 주요 원료·유도품의 13주 평균 경로를 비교할 수 있습니다.
@@ -279,6 +279,7 @@
           <button class="chip" data-product-type="curve">곡선</button>
           <button class="chip" data-product-type="line">선</button>
           <button class="chip" data-product-type="bar">막대</button>
+          <button class="btn market-btn" id="marketViewBtn">시황 보기</button>
                   </div>
         <div class="canvas-box large" style="margin-top:14px"><canvas id="productChart"></canvas></div>
       </div>
@@ -340,7 +341,7 @@
           <thead>
             <tr>
               <th>주차</th>
-              <th>기간</th>
+              <th>기준일</th>
               <th>조기종전</th>
               <th>교착유지</th>
               <th>확전·장기화</th>
@@ -396,9 +397,9 @@ Chart.register(ChartDataLabels);
 
 const weeks = ["W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13","W14","W15"];
 const dateLabels = {
-  W3: "3/16~3/21", W4: "3/23~3/28", W5: "3/30~4/04", W6: "4/07~4/11", W7: "4/14~4/18",
-  W8: "4/21~4/25", W9: "4/28~5/02", W10: "5/05~5/09", W11: "5/12~5/16", W12: "5/19~5/23",
-  W13: "5/26~5/30", W14: "6/02~6/06", W15: "6/09~6/13"
+  W3: "3/20", W4: "3/27", W5: "4/03", W6: "4/10", W7: "4/17",
+  W8: "4/24", W9: "5/01", W10: "5/08", W11: "5/15", W12: "5/22",
+  W13: "5/29", W14: "6/05", W15: "6/12"
 };
 const monthMap = {
   "3월": ["W3","W4","W5"],
@@ -600,7 +601,7 @@ function buildWeekButtons(){
   weeks.forEach(w=>{
     const b = document.createElement("button");
     b.className = "btn" + (state.selectedWeek===w ? " active":"");
-    b.textContent = w;
+    b.textContent = `${w} (${dateLabels[w]})`;
     b.onclick = ()=>{ state.selectedWeek = w; renderAll(); };
     box.appendChild(b);
   });
@@ -693,7 +694,7 @@ function updateMetrics(){
   const absCost = styrene * 0.6 + an * 0.25 + bd * 0.15;
   const absSpread = abs - absCost;
 
-  document.getElementById("selectedWeekText").textContent = `선택 주차: ${state.selectedWeek} · ${dateLabels[state.selectedWeek]} · ${scenarios[state.selectedScenario].label}`;
+  document.getElementById("selectedWeekText").textContent = `선택 주차: ${state.selectedWeek} (${dateLabels[state.selectedWeek]}) · ${scenarios[state.selectedScenario].label}`;
   document.getElementById("metricOil").textContent = fmt(oilValue);
   document.getElementById("metricOilSub").textContent = `${scenarios[state.selectedScenario].label} · $/bbl`;
 
@@ -879,7 +880,7 @@ function renderOilChart(){
   oilChart = new Chart(document.getElementById("oilChart"), {
     type: state.oilChartType === "bar" ? "bar" : "line",
     data: {
-      labels: weeks,
+      labels: weeks.map(w => `${w} (${dateLabels[w]})`),
       datasets: [makeDataset(`${scenarios[state.selectedScenario].label} Brent`, data, colors[state.selectedScenario], state.oilChartType)]
     },
     options: commonOptions()
@@ -891,7 +892,7 @@ function renderProductChart(){
   productChart = new Chart(document.getElementById("productChart"), {
     type: state.productChartType === "bar" ? "bar" : "line",
     data: {
-      labels: weeks,
+      labels: weeks.map(w => `${w} (${dateLabels[w]})`),
       datasets: [
         makeDataset("S1", p.S1, colors.S1, state.productChartType),
         makeDataset("S2", p.S2, colors.S2, state.productChartType),
@@ -912,13 +913,30 @@ function renderMultiChart(){
   });
   multiChart = new Chart(document.getElementById("multiChart"), {
     type: state.productChartType === "bar" ? "bar" : "line",
-    data: { labels: weeks, datasets },
+    data: { labels: weeks.map(w => `${w} (${dateLabels[w]})`), datasets },
     options: commonOptions()
   });
 }
 
 
 
+
+
+function formatMarketText(text){
+  if (!text) return "";
+  let t = text;
+  t = t.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const tags = ["가격경로","핵심 변수","리스크","수요 파괴","반등 조건","W15 타깃","공급","수요","원가","시사점","방향","핵심 요인"];
+  tags.forEach(tag => {
+    const re = new RegExp(`\\s*\\[${tag}\\]\\s*`, "g");
+    t = t.replace(re, `\n[${tag}]\n`);
+  });
+  t = t.replace(/\s*■\s*/g, "\n■ ");
+  t = t.replace(/\s*▶\s*/g, "\n▶ ");
+  t = t.replace(/\s*→\s*/g, "\n→ ");
+  t = t.replace(/\n{3,}/g, "\n\n").trim();
+  return t;
+}
 
 function updateMarketModalContent(){
   const p = products[state.selectedProduct];
