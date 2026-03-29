@@ -460,11 +460,12 @@ const products = {
     insight:"PC는 몰딩급만 반영했습니다. 3/25 기준 PC GP Moulding CIF China mid는 2,350달러로, 현물 가용성 축소와 4~5월 NE Asia 보수 전망이 가격을 지지하고 있습니다."}
 };
 
-const colors = {
+window.colors = window.colors || {
   S1: "rgba(34,197,94,1)",
   S2: "rgba(245,158,11,1)",
   S3: "rgba(239,68,68,1)"
 };
+const COLORS = window.colors;
 
 let state = {
   selectedScenario: "S2",
@@ -1081,18 +1082,20 @@ function commonOptions(){
 }
 
 function renderOilChart(){
+  const COLORS = window.colors || {S1:"rgba(34,197,94,1)",S2:"rgba(245,158,11,1)",S3:"rgba(239,68,68,1)"};
   if(oilChart) oilChart.destroy();
   const data = products.brent[state.selectedScenario];
   oilChart = new Chart(document.getElementById("oilChart"), {
     type: state.oilChartType === "bar" ? "bar" : "line",
     data: {
       labels: weeks.map(w => `${w} (${dateLabels[w]})`),
-      datasets: [makeDataset(`${scenarios[state.selectedScenario].label} WTI`, data, colors[state.selectedScenario], state.oilChartType)]
+      datasets: [makeDataset(`${scenarios[state.selectedScenario].label} WTI`, data, COLORS[state.selectedScenario], state.oilChartType)]
     },
     options: commonOptions()
   });
 }
 function renderProductChart(){
+  const COLORS = window.colors || {S1:"rgba(34,197,94,1)",S2:"rgba(245,158,11,1)",S3:"rgba(239,68,68,1)"};
   if(productChart) productChart.destroy();
   const p = products[state.selectedProduct];
   productChart = new Chart(document.getElementById("productChart"), {
@@ -1100,9 +1103,9 @@ function renderProductChart(){
     data: {
       labels: weeks.map(w => `${w} (${dateLabels[w]})`),
       datasets: [
-        makeDataset("S1", p.S1, colors.S1, state.productChartType),
-        makeDataset("S2", p.S2, colors.S2, state.productChartType),
-        makeDataset("S3", p.S3, colors.S3, state.productChartType)
+        makeDataset("S1", p.S1, COLORS.S1, state.productChartType),
+        makeDataset("S2", p.S2, COLORS.S2, state.productChartType),
+        makeDataset("S3", p.S3, COLORS.S3, state.productChartType)
       ]
     },
     options: commonOptions()
